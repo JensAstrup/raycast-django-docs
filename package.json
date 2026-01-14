@@ -20,6 +20,13 @@
       "title": "Search Documentation",
       "description": "Searches through the latest version's documentation",
       "mode": "view"
+    },
+    {
+      "name": "refresh-docs",
+      "title": "Refresh Django Docs Cache",
+      "description": "Background job to refresh cached documentation",
+      "mode": "no-view",
+      "interval": "1d"
     }
   ],
   "dependencies": {
