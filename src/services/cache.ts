@@ -52,9 +52,9 @@ export function readCache(version: DjangoVersion): DocEntry[] | null {
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
       const c = cached.entries[i];
-      entry.parent = c.parentUrl ? entryByUrl.get(c.parentUrl) ?? null : null;
-      entry.previous = c.previousUrl ? entryByUrl.get(c.previousUrl) ?? null : null;
-      entry.next = c.nextUrl ? entryByUrl.get(c.nextUrl) ?? null : null;
+      entry.parent = c.parentUrl ? (entryByUrl.get(c.parentUrl) ?? null) : null;
+      entry.previous = c.previousUrl ? (entryByUrl.get(c.previousUrl) ?? null) : null;
+      entry.next = c.nextUrl ? (entryByUrl.get(c.nextUrl) ?? null) : null;
     }
 
     return entries;

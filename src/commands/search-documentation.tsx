@@ -2,7 +2,7 @@ import { ActionPanel, List, Action, Icon, showToast, Toast } from "@raycast/api"
 import { useEffect, useState } from "react";
 import { DocEntry } from "../types/DocEntry";
 import { fetchDocEntries } from "../services/django-docs";
-import { writeCache, getLastRefreshDate, readCache } from "../services/cache";
+import { writeCache, readCache } from "../services/cache";
 import { DocDetail } from "../components/DocDetail";
 import { DjangoVersion } from "../constants";
 

@@ -18,8 +18,12 @@ export function DocDetail({ entry }: DocDetailProps) {
       metadata={
         entry.parent || entry.previous || entry.next ? (
           <Detail.Metadata>
-            {entry.parent && <Detail.Metadata.Link title="Parent" target={entry.parent.url} text={entry.parent.title} />}
-            {entry.previous && <Detail.Metadata.Link title="Previous" target={entry.previous.url} text={entry.previous.title} />}
+            {entry.parent && (
+              <Detail.Metadata.Link title="Parent" target={entry.parent.url} text={entry.parent.title} />
+            )}
+            {entry.previous && (
+              <Detail.Metadata.Link title="Previous" target={entry.previous.url} text={entry.previous.title} />
+            )}
             {entry.next && <Detail.Metadata.Link title="Next" target={entry.next.url} text={entry.next.title} />}
           </Detail.Metadata>
         ) : undefined
