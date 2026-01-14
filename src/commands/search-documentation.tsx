@@ -42,9 +42,7 @@ export default function SearchDocumentationCommand() {
 
         // No cache - fetch fresh
         const toast = await showToast({ style: Toast.Style.Animated, title: "Fetching documentation..." });
-        const docEntries = await fetchDocEntries((status, total) => {
-          showToast({ style: Toast.Style.Animated, title: `Loading ${total} pages: ${status}` });
-        });
+        const docEntries = await fetchDocEntries();
         toast.hide();
 
         setEntries(docEntries);

@@ -49,9 +49,7 @@ export async function fetchPageContent(url: string): Promise<PageContent> {
   return { title, content: markdown, prevUrl, nextUrl };
 }
 
-export async function fetchDocEntries(
-  onProgress?: (status: string, total: number) => void,
-): Promise<DocEntry[]> {
+export async function fetchDocEntries(): Promise<DocEntry[]> {
   const allUrls = await fetchSitemap();
   const filteredUrls = filterTopicsUrls(allUrls);
 
@@ -66,8 +64,6 @@ export async function fetchDocEntries(
 
   for (let i = 0; i < filteredUrls.length; i++) {
     const url = filteredUrls[i];
-    const statusText = url.split("/").slice(-2, -1)[0] || "page";
-    onProgress?.(statusText, filteredUrls.length);
 
     try {
       const { title, content, prevUrl, nextUrl } = await fetchPageContent(url);
