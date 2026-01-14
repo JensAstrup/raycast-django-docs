@@ -1,4 +1,4 @@
-import { ActionPanel, Detail, Action } from "@raycast/api";
+import { ActionPanel, Detail, Action, Icon } from "@raycast/api";
 import { DocEntry } from "../types/DocEntry";
 
 interface DocDetailProps {
@@ -13,6 +13,27 @@ export function DocDetail({ entry }: DocDetailProps) {
         <ActionPanel>
           <Action.OpenInBrowser url={entry.url} title="Open in Browser" />
           <Action.CopyToClipboard content={entry.url} title="Copy URL" />
+          {entry.parent && (
+            <Action.Push
+              title={`Parent: ${entry.parent.title}`}
+              icon={Icon.ArrowUp}
+              target={<DocDetail entry={entry.parent} />}
+            />
+          )}
+          {entry.previous && (
+            <Action.Push
+              title={`Previous: ${entry.previous.title}`}
+              icon={Icon.ArrowLeft}
+              target={<DocDetail entry={entry.previous} />}
+            />
+          )}
+          {entry.next && (
+            <Action.Push
+              title={`Next: ${entry.next.title}`}
+              icon={Icon.ArrowRight}
+              target={<DocDetail entry={entry.next} />}
+            />
+          )}
         </ActionPanel>
       }
       metadata={

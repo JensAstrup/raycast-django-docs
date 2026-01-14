@@ -9,6 +9,7 @@ import {
   removeHeaderLinks,
   stripPilcrows,
 } from "../utils/html-to-markdown";
+import { showToast, Toast } from "@raycast/api";
 
 interface PageContent {
   title: string;
@@ -61,14 +62,14 @@ export async function fetchDocEntries(): Promise<DocEntry[]> {
     nextUrl: string | null;
   }> = [];
 
-  for (let i = 0; i < filteredUrls.length; i++) {
-    const url = filteredUrls[i];
-
+  for (const url of filteredUrls) {
     try {
       const { title, content, prevUrl, nextUrl } = await fetchPageContent(url);
       rawEntries.push({ url, title, content, prevUrl, nextUrl });
     } catch (error) {
       console.error(`Failed to fetch ${url}:`, error);
+      showToast({ style: Toast.Style.Failure, title: `Failed to fetch ${url}` });
+      throw error;
     }
   }
 
@@ -86,9 +87,8 @@ export async function fetchDocEntries(): Promise<DocEntry[]> {
   const entryByUrl = new Map<string, DocEntry>(entries.map((e) => [e.url, e]));
 
   // Link parent, prev, and next references
-  for (let i = 0; i < entries.length; i++) {
-    const entry = entries[i];
-    const raw = rawEntries[i];
+  for (const [index, entry] of entries.entries()) {
+    const raw = rawEntries[index];
 
     // Parent: section top-level entry (e.g., /ref/class-based-views/ for all its children)
     const parentUrl = getSectionParentUrl(entry.url);

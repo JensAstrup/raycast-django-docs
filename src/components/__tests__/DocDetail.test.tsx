@@ -193,4 +193,120 @@ describe("DocDetail", () => {
     expect(markdown).toHaveTextContent(entryWithSpecialChars.title);
     expect(markdown).toHaveTextContent(entryWithSpecialChars.content);
   });
+
+  describe("navigation actions", () => {
+    it("does not render navigation actions when no parent, previous, or next", () => {
+      render(<DocDetail entry={mockEntry} />);
+
+      const pushActions = screen.queryAllByTestId("action-push");
+      expect(pushActions).toHaveLength(0);
+    });
+
+    it("renders parent navigation action when parent exists", () => {
+      const entryWithParent: DocEntry = {
+        ...mockEntry,
+        parent: {
+          url: "https://docs.djangoproject.com/en/dev/topics/",
+          title: "Topics",
+          content: "Topics content",
+          parent: null,
+          previous: null,
+          next: null,
+        },
+      };
+
+      render(<DocDetail entry={entryWithParent} />);
+
+      const pushActions = screen.getAllByTestId("action-push");
+      const parentAction = pushActions.find((action) => action.getAttribute("data-title")?.startsWith("Parent:"));
+      expect(parentAction).toBeDefined();
+      expect(parentAction).toHaveAttribute("data-title", "Parent: Topics");
+    });
+
+    it("renders previous navigation action when previous exists", () => {
+      const entryWithPrevious: DocEntry = {
+        ...mockEntry,
+        previous: {
+          url: "https://docs.djangoproject.com/en/dev/topics/forms/",
+          title: "Forms",
+          content: "Forms content",
+          parent: null,
+          previous: null,
+          next: null,
+        },
+      };
+
+      render(<DocDetail entry={entryWithPrevious} />);
+
+      const pushActions = screen.getAllByTestId("action-push");
+      const previousAction = pushActions.find((action) => action.getAttribute("data-title")?.startsWith("Previous:"));
+      expect(previousAction).toBeDefined();
+      expect(previousAction).toHaveAttribute("data-title", "Previous: Forms");
+    });
+
+    it("renders next navigation action when next exists", () => {
+      const entryWithNext: DocEntry = {
+        ...mockEntry,
+        next: {
+          url: "https://docs.djangoproject.com/en/dev/topics/db/",
+          title: "Database",
+          content: "Database content",
+          parent: null,
+          previous: null,
+          next: null,
+        },
+      };
+
+      render(<DocDetail entry={entryWithNext} />);
+
+      const pushActions = screen.getAllByTestId("action-push");
+      const nextAction = pushActions.find((action) => action.getAttribute("data-title")?.startsWith("Next:"));
+      expect(nextAction).toBeDefined();
+      expect(nextAction).toHaveAttribute("data-title", "Next: Database");
+    });
+
+    it("renders all navigation actions when parent, previous, and next exist", () => {
+      const fullEntry: DocEntry = {
+        ...mockEntry,
+        parent: {
+          url: "https://docs.djangoproject.com/en/dev/topics/",
+          title: "Topics",
+          content: "Topics content",
+          parent: null,
+          previous: null,
+          next: null,
+        },
+        previous: {
+          url: "https://docs.djangoproject.com/en/dev/topics/forms/",
+          title: "Forms",
+          content: "Forms content",
+          parent: null,
+          previous: null,
+          next: null,
+        },
+        next: {
+          url: "https://docs.djangoproject.com/en/dev/topics/db/",
+          title: "Database",
+          content: "Database content",
+          parent: null,
+          previous: null,
+          next: null,
+        },
+      };
+
+      render(<DocDetail entry={fullEntry} />);
+
+      const pushActions = screen.getAllByTestId("action-push");
+      expect(pushActions).toHaveLength(3);
+
+      const parentAction = pushActions.find((action) => action.getAttribute("data-title")?.startsWith("Parent:"));
+      expect(parentAction).toHaveAttribute("data-title", "Parent: Topics");
+
+      const previousAction = pushActions.find((action) => action.getAttribute("data-title")?.startsWith("Previous:"));
+      expect(previousAction).toHaveAttribute("data-title", "Previous: Forms");
+
+      const nextAction = pushActions.find((action) => action.getAttribute("data-title")?.startsWith("Next:"));
+      expect(nextAction).toHaveAttribute("data-title", "Next: Database");
+    });
+  });
 });

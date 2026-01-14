@@ -20,6 +20,9 @@ export const Icon = {
   Eye: "eye",
   Download: "download",
   XMarkCircle: "xmarkcircle",
+  ArrowUp: "arrowup",
+  ArrowLeft: "arrowleft",
+  ArrowRight: "arrowright",
 };
 
 export const showToast = jest.fn().mockResolvedValue({ hide: jest.fn() });

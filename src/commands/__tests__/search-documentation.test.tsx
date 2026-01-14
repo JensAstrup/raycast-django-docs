@@ -345,8 +345,8 @@ describe("SearchDocumentationCommand", () => {
       });
 
       const pushActions = screen.getAllByTestId("action-push");
-      expect(pushActions).toHaveLength(3);
-      expect(pushActions[0]).toHaveAttribute("data-title", "View Documentation");
+      const viewDocActions = pushActions.filter((action) => action.getAttribute("data-title") === "View Documentation");
+      expect(viewDocActions).toHaveLength(3);
     });
 
     it("renders open in browser action with correct URL", async () => {

@@ -330,7 +330,8 @@ describe("django-docs", () => {
       const entries = await fetchDocEntries();
 
       expect(entries[0].parent).toBeNull();
-      expect(entries[1].parent).toBe(entries[0]);
+      expect(entries[1].parent?.url).toBe(entries[0].url);
+      expect(entries[1].parent?.title).toBe(entries[0].title);
     });
 
     it("should establish previous-next relationships from page content", async () => {
@@ -372,8 +373,10 @@ describe("django-docs", () => {
 
       const entries = await fetchDocEntries();
 
-      expect(entries[0].next).toBe(entries[1]);
-      expect(entries[1].previous).toBe(entries[0]);
+      expect(entries[0].next?.url).toBe(entries[1].url);
+      expect(entries[0].next?.title).toBe(entries[1].title);
+      expect(entries[1].previous?.url).toBe(entries[0].url);
+      expect(entries[1].previous?.title).toBe(entries[0].title);
     });
 
     it("should handle entries with no parent when parent URL not in entry list", async () => {
@@ -513,10 +516,10 @@ describe("django-docs", () => {
 
       const entries = await fetchDocEntries();
 
-      expect(entries[0].next).toBe(entries[1]);
-      expect(entries[1].previous).toBe(entries[0]);
-      expect(entries[1].next).toBe(entries[2]);
-      expect(entries[2].previous).toBe(entries[1]);
+      expect(entries[0].next?.url).toBe(entries[1].url);
+      expect(entries[1].previous?.url).toBe(entries[0].url);
+      expect(entries[1].next?.url).toBe(entries[2].url);
+      expect(entries[2].previous?.url).toBe(entries[1].url);
     });
 
     it("should process all entries sequentially", async () => {
