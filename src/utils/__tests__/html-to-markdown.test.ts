@@ -42,7 +42,7 @@ describe("html-to-markdown", () => {
       expect(typeof ruleConfig.replacement).toBe("function");
     });
 
-    it("should format code blocks with language identifier", () => {
+    it("should format code blocks with language identifier using raw textContent", () => {
       const mockService = {
         addRule: jest.fn(),
       };
@@ -56,9 +56,10 @@ describe("html-to-markdown", () => {
       const mockNode = document.createElement("pre");
       const codeElement = document.createElement("code");
       codeElement.className = "language-python";
+      codeElement.textContent = "print('hello')";
       mockNode.appendChild(codeElement);
 
-      const result = ruleConfig.replacement("print('hello')", mockNode);
+      const result = ruleConfig.replacement("escaped\\_content", mockNode);
 
       expect(result).toBe("\n```python\nprint('hello')\n```\n");
     });
@@ -76,9 +77,10 @@ describe("html-to-markdown", () => {
       const ruleConfig = mockService.addRule.mock.calls[0][1];
       const mockNode = document.createElement("pre");
       const codeElement = document.createElement("code");
+      codeElement.textContent = "console.log('test')";
       mockNode.appendChild(codeElement);
 
-      const result = ruleConfig.replacement("console.log('test')", mockNode);
+      const result = ruleConfig.replacement("escaped", mockNode);
 
       expect(result).toBe("\n```\nconsole.log('test')\n```\n");
     });
@@ -95,8 +97,9 @@ describe("html-to-markdown", () => {
 
       const ruleConfig = mockService.addRule.mock.calls[0][1];
       const mockNode = document.createElement("pre");
+      mockNode.textContent = "plain text";
 
-      const result = ruleConfig.replacement("plain text", mockNode);
+      const result = ruleConfig.replacement("escaped", mockNode);
 
       expect(result).toBe("\n```\nplain text\n```\n");
     });
@@ -124,9 +127,10 @@ describe("html-to-markdown", () => {
         const mockNode = document.createElement("pre");
         const codeElement = document.createElement("code");
         codeElement.className = className;
+        codeElement.textContent = "code";
         mockNode.appendChild(codeElement);
 
-        const result = ruleConfig.replacement("code", mockNode);
+        const result = ruleConfig.replacement("escaped", mockNode);
 
         expect(result).toBe(`\n\`\`\`${expected}\ncode\n\`\`\`\n`);
       });

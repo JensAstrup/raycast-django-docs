@@ -5,6 +5,7 @@
   "description": "Navigate and search through Django documentation",
   "icon": "extension-icon.png",
   "author": "JensAstrup",
+  "contributors": ["Jens Astrup"],
   "platforms": [
     "macOS",
     "Windows"

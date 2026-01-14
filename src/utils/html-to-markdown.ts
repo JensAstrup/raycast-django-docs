@@ -9,10 +9,11 @@ export function createTurndownService(): TurndownService {
 
   service.addRule("codeBlocks", {
     filter: ["pre"],
-    replacement: function (content, node) {
+    replacement: function (_content, node) {
       const codeElement = (node as Element).querySelector("code");
       const language = codeElement?.className?.match(/language-(\w+)/)?.[1] || "";
-      return `\n\`\`\`${language}\n${content}\n\`\`\`\n`;
+      const rawContent = (node as Element).textContent || "";
+      return `\n\`\`\`${language}\n${rawContent}\n\`\`\`\n`;
     },
   });
 
