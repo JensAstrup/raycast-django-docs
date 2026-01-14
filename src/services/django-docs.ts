@@ -1,4 +1,3 @@
-import axios from "axios";
 import * as cheerio from "cheerio";
 import { DocEntry } from "../types/DocEntry";
 import { fetchSitemap } from "./sitemap";
@@ -19,8 +18,12 @@ interface PageContent {
 }
 
 export async function fetchPageContent(url: string): Promise<PageContent> {
-  const response = await axios.get(url);
-  const $ = cheerio.load(response.data);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+  }
+  const data = await response.text();
+  const $ = cheerio.load(data);
 
   // Extract prev/next from the Browse navigation before any modifications
   const browseNav = $('nav[aria-labelledby="browse-header"]');

@@ -1,9 +1,8 @@
-import axios from "axios";
 import { fetchSitemap } from "../sitemap";
 import { SITEMAP_URL } from "../../constants";
 
-jest.mock("axios");
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
 
 describe("sitemap", () => {
   beforeEach(() => {
@@ -25,11 +24,14 @@ describe("sitemap", () => {
   </url>
 </urlset>`;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockSitemapXml });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(mockSitemapXml),
+      });
 
       const urls = await fetchSitemap();
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(SITEMAP_URL);
+      expect(mockFetch).toHaveBeenCalledWith(SITEMAP_URL);
       expect(urls).toEqual([
         "https://docs.djangoproject.com/en/dev/topics/http/",
         "https://docs.djangoproject.com/en/dev/ref/models/",
@@ -46,11 +48,14 @@ describe("sitemap", () => {
   </url>
 </urlset>`;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockSitemapXml });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(mockSitemapXml),
+      });
 
       const urls = await fetchSitemap(customUrl);
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(customUrl);
+      expect(mockFetch).toHaveBeenCalledWith(customUrl);
       expect(urls).toEqual(["https://example.com/page1"]);
     });
 
@@ -59,7 +64,10 @@ describe("sitemap", () => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </urlset>`;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockSitemapXml });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(mockSitemapXml),
+      });
 
       const urls = await fetchSitemap();
 
@@ -80,7 +88,10 @@ describe("sitemap", () => {
   </url>
 </urlset>`;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockSitemapXml });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(mockSitemapXml),
+      });
 
       const urls = await fetchSitemap();
 
@@ -103,7 +114,10 @@ describe("sitemap", () => {
   </url>
 </urlset>`;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockSitemapXml });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(mockSitemapXml),
+      });
 
       const urls = await fetchSitemap();
 
@@ -113,12 +127,23 @@ describe("sitemap", () => {
       ]);
     });
 
-    it("should propagate axios errors", async () => {
+    it("should throw error on fetch failure", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
+      });
+
+      await expect(fetchSitemap()).rejects.toThrow("Failed to fetch sitemap: 500 Internal Server Error");
+      expect(mockFetch).toHaveBeenCalledWith(SITEMAP_URL);
+    });
+
+    it("should propagate network errors", async () => {
       const error = new Error("Network error");
-      mockedAxios.get.mockRejectedValueOnce(error);
+      mockFetch.mockRejectedValueOnce(error);
 
       await expect(fetchSitemap()).rejects.toThrow("Network error");
-      expect(mockedAxios.get).toHaveBeenCalledWith(SITEMAP_URL);
+      expect(mockFetch).toHaveBeenCalledWith(SITEMAP_URL);
     });
 
     it("should handle malformed XML gracefully", async () => {
@@ -131,7 +156,10 @@ describe("sitemap", () => {
     <loc>https://docs.djangoproject.com/en/dev/ref/models/</loc>
 </urlset>`;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockSitemapXml });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(mockSitemapXml),
+      });
 
       const urls = await fetchSitemap();
 
@@ -139,7 +167,10 @@ describe("sitemap", () => {
     });
 
     it("should handle empty response", async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: "" });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(""),
+      });
 
       const urls = await fetchSitemap();
 
@@ -153,7 +184,10 @@ describe("sitemap", () => {
 ${urls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}
 </urlset>`;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockSitemapXml });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(mockSitemapXml),
+      });
 
       const result = await fetchSitemap();
 

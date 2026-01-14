@@ -8,50 +8,103 @@ import { DocEntry } from "../../types/DocEntry";
 jest.mock("../../services/django-docs");
 jest.mock("../../services/cache");
 
+// Mock useCachedPromise to simulate the hook behavior
+jest.mock("@raycast/utils", () => ({
+  useCachedPromise: jest.fn(
+    (
+      fn: (...args: unknown[]) => Promise<unknown>,
+      args: unknown[],
+      options?: { onError?: (error: Error) => void }
+    ) => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const React = require("react");
+      const [result, setResult] = React.useState({
+        data: undefined as unknown,
+        isLoading: true,
+        error: undefined as unknown,
+      });
+
+      React.useEffect(() => {
+        let cancelled = false;
+        fn(...args)
+          .then((data: unknown) => {
+            if (!cancelled) {
+              setResult({ data, isLoading: false, error: undefined });
+            }
+          })
+          .catch((error: Error) => {
+            if (!cancelled) {
+              setResult({ data: undefined, isLoading: false, error });
+              options?.onError?.(error);
+            }
+          });
+        return () => {
+          cancelled = true;
+        };
+      }, [...args]);
+
+      return result;
+    }
+  ),
+}));
+
 const mockedFetchDocEntries = fetchDocEntries as jest.MockedFunction<typeof fetchDocEntries>;
 const mockedReadCache = readCache as jest.MockedFunction<typeof readCache>;
 const mockedWriteCache = writeCache as jest.MockedFunction<typeof writeCache>;
 const mockedShowToast = showToast as jest.MockedFunction<typeof showToast>;
 
 describe("SearchDocumentationCommand", () => {
-  const mockEntries: DocEntry[] = [
-    {
-      url: "https://docs.djangoproject.com/en/dev/topics/http/",
-      title: "HTTP Request Handling",
-      content: "HTTP content",
-      parent: {
-        url: "https://docs.djangoproject.com/en/dev/topics/",
-        title: "Topics",
-        content: "Topics content",
-        parent: null,
-        previous: null,
-        next: null,
-      },
-      previous: null,
-      next: null,
-    },
-    {
-      url: "https://docs.djangoproject.com/en/dev/topics/db/",
-      title: "Database",
-      content: "Database content",
-      parent: null,
-      previous: null,
-      next: null,
-    },
-    {
-      url: "https://docs.djangoproject.com/en/dev/topics/forms/",
-      title: "Forms",
-      content: "Forms content",
-      parent: null,
-      previous: null,
-      next: null,
-    },
-  ];
+  let consoleErrorSpy: jest.SpyInstance;
+
+  // Create entries with proper circular references
+  const topicsEntry: DocEntry = {
+    url: "https://docs.djangoproject.com/en/dev/topics/",
+    title: "Topics",
+    content: "Topics content",
+    parent: null,
+    previous: null,
+    next: null,
+  };
+
+  const httpEntry: DocEntry = {
+    url: "https://docs.djangoproject.com/en/dev/topics/http/",
+    title: "HTTP Request Handling",
+    content: "HTTP content",
+    parent: topicsEntry,
+    previous: null,
+    next: null,
+  };
+
+  const dbEntry: DocEntry = {
+    url: "https://docs.djangoproject.com/en/dev/topics/db/",
+    title: "Database",
+    content: "Database content",
+    parent: null,
+    previous: null,
+    next: null,
+  };
+
+  const formsEntry: DocEntry = {
+    url: "https://docs.djangoproject.com/en/dev/topics/forms/",
+    title: "Forms",
+    content: "Forms content",
+    parent: null,
+    previous: null,
+    next: null,
+  };
+
+  // Array includes parent entry so it can be resolved during deserialization
+  const mockEntries: DocEntry[] = [topicsEntry, httpEntry, dbEntry, formsEntry];
 
   beforeEach(() => {
     jest.clearAllMocks();
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     const mockToast = { hide: jest.fn() };
     mockedShowToast.mockResolvedValue(mockToast as unknown as Awaited<ReturnType<typeof showToast>>);
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 
   describe("loading from cache", () => {
@@ -69,7 +122,7 @@ describe("SearchDocumentationCommand", () => {
       expect(mockedShowToast).not.toHaveBeenCalled();
 
       const listItems = screen.getAllByTestId("list-item");
-      expect(listItems).toHaveLength(3);
+      expect(listItems).toHaveLength(4);
     });
 
     it("displays loading state initially", () => {
@@ -90,11 +143,14 @@ describe("SearchDocumentationCommand", () => {
       });
 
       const items = screen.getAllByTestId("list-item");
-      expect(items[0]).toHaveAttribute("data-title", "HTTP Request Handling");
-      expect(items[0]).toHaveAttribute("data-subtitle", "Topics");
-      expect(items[1]).toHaveAttribute("data-title", "Database");
-      expect(items[1]).toHaveAttribute("data-subtitle", "");
-      expect(items[2]).toHaveAttribute("data-title", "Forms");
+      // Index 0 is Topics (parent), Index 1 is HTTP Request Handling (child of Topics)
+      expect(items[0]).toHaveAttribute("data-title", "Topics");
+      expect(items[0]).toHaveAttribute("data-subtitle", "");
+      expect(items[1]).toHaveAttribute("data-title", "HTTP Request Handling");
+      expect(items[1]).toHaveAttribute("data-subtitle", "Topics");
+      expect(items[2]).toHaveAttribute("data-title", "Database");
+      expect(items[2]).toHaveAttribute("data-subtitle", "");
+      expect(items[3]).toHaveAttribute("data-title", "Forms");
     });
 
     it("displays document icon for each item", async () => {
@@ -135,11 +191,11 @@ describe("SearchDocumentationCommand", () => {
 
       expect(mockedShowToast).toHaveBeenCalledWith({
         style: Toast.Style.Success,
-        title: "Loaded 3 documentation pages",
+        title: "Loaded 4 documentation pages",
       });
 
       const listItems = screen.getAllByTestId("list-item");
-      expect(listItems).toHaveLength(3);
+      expect(listItems).toHaveLength(4);
     });
 
     it("fetches entries when cache returns empty array", async () => {
@@ -192,7 +248,7 @@ describe("SearchDocumentationCommand", () => {
       await waitFor(() => {
         expect(mockedShowToast).toHaveBeenCalledWith({
           style: Toast.Style.Success,
-          title: "Loaded 3 documentation pages",
+          title: "Loaded 4 documentation pages",
         });
       });
     });
@@ -219,7 +275,6 @@ describe("SearchDocumentationCommand", () => {
 
   describe("error handling", () => {
     it("shows failure toast when fetch fails", async () => {
-      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
       mockedReadCache.mockReturnValue(null);
       const error = new Error("Network error");
       mockedFetchDocEntries.mockRejectedValue(error);
@@ -235,12 +290,9 @@ describe("SearchDocumentationCommand", () => {
 
       expect(screen.getByTestId("list")).toHaveAttribute("data-loading", "false");
       expect(consoleErrorSpy).toHaveBeenCalledWith("Error loading docs:", error);
-
-      consoleErrorSpy.mockRestore();
     });
 
     it("stops loading when fetch fails", async () => {
-      jest.spyOn(console, "error").mockImplementation();
       mockedReadCache.mockReturnValue(null);
       mockedFetchDocEntries.mockRejectedValue(new Error("Network error"));
 
@@ -255,7 +307,6 @@ describe("SearchDocumentationCommand", () => {
     });
 
     it("does not write to cache when fetch fails", async () => {
-      jest.spyOn(console, "error").mockImplementation();
       mockedReadCache.mockReturnValue(null);
       mockedFetchDocEntries.mockRejectedValue(new Error("Network error"));
 
@@ -346,7 +397,7 @@ describe("SearchDocumentationCommand", () => {
 
       const pushActions = screen.getAllByTestId("action-push");
       const viewDocActions = pushActions.filter((action) => action.getAttribute("data-title") === "View Documentation");
-      expect(viewDocActions).toHaveLength(3);
+      expect(viewDocActions).toHaveLength(4);
     });
 
     it("renders open in browser action with correct URL", async () => {
@@ -412,7 +463,7 @@ describe("SearchDocumentationCommand", () => {
       });
 
       const listItems = screen.getAllByTestId("list-item");
-      expect(listItems).toHaveLength(3);
+      expect(listItems).toHaveLength(4);
     });
   });
 
@@ -430,7 +481,7 @@ describe("SearchDocumentationCommand", () => {
 
       expect(mockedFetchDocEntries).not.toHaveBeenCalled();
       const listItems = screen.getAllByTestId("list-item");
-      expect(listItems).toHaveLength(3);
+      expect(listItems).toHaveLength(4);
     });
 
     it("fetches from API, shows toast, caches result, then displays entries", async () => {
@@ -461,7 +512,7 @@ describe("SearchDocumentationCommand", () => {
       });
 
       const listItems = screen.getAllByTestId("list-item");
-      expect(listItems).toHaveLength(3);
+      expect(listItems).toHaveLength(4);
     });
   });
 });

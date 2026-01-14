@@ -13,6 +13,8 @@ const mockedShouldRefresh = shouldRefresh as jest.MockedFunction<typeof shouldRe
 const mockedShowToast = showToast as jest.MockedFunction<typeof showToast>;
 
 describe("RefreshDocsCommand", () => {
+  let consoleErrorSpy: jest.SpyInstance;
+
   const mockEntries = [
     {
       url: "https://docs.djangoproject.com/en/dev/topics/http/",
@@ -34,8 +36,13 @@ describe("RefreshDocsCommand", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     mockedFetchDocEntries.mockResolvedValue(mockEntries);
     mockedShowToast.mockResolvedValue({ hide: jest.fn() } as unknown as Awaited<ReturnType<typeof showToast>>);
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 
   describe("user-initiated refresh", () => {
@@ -247,7 +254,6 @@ describe("RefreshDocsCommand", () => {
 
   describe("error handling", () => {
     it("logs error to console when fetch fails", async () => {
-      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
       mockedShouldRefresh.mockReturnValue(true);
       const error = new Error("Network error");
       mockedFetchDocEntries.mockRejectedValue(error);
@@ -258,7 +264,6 @@ describe("RefreshDocsCommand", () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to refresh 6.0:", error);
-      consoleErrorSpy.mockRestore();
     });
 
     it("handles multiple version failures gracefully", async () => {

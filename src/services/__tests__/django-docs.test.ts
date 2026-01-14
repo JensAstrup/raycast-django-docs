@@ -1,4 +1,3 @@
-import axios from "axios";
 import { fetchPageContent, fetchDocEntries } from "../django-docs";
 import { fetchSitemap } from "../sitemap";
 import { filterTopicsUrls, getSectionParentUrl } from "../../utils/url-filters";
@@ -9,12 +8,13 @@ import {
   stripPilcrows,
 } from "../../utils/html-to-markdown";
 
-jest.mock("axios");
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
+
 jest.mock("../sitemap");
 jest.mock("../../utils/url-filters");
 jest.mock("../../utils/html-to-markdown");
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockedFetchSitemap = fetchSitemap as jest.MockedFunction<typeof fetchSitemap>;
 const mockedFilterTopicsUrls = filterTopicsUrls as jest.MockedFunction<typeof filterTopicsUrls>;
 const mockedGetSectionParentUrl = getSectionParentUrl as jest.MockedFunction<typeof getSectionParentUrl>;
@@ -24,8 +24,15 @@ const mockedRemoveHeaderLinks = removeHeaderLinks as jest.MockedFunction<typeof 
 const mockedStripPilcrows = stripPilcrows as jest.MockedFunction<typeof stripPilcrows>;
 
 describe("django-docs", () => {
+  let consoleErrorSpy: jest.SpyInstance;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 
   describe("fetchPageContent", () => {
@@ -49,7 +56,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: htmlContent });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(htmlContent),
+      });
       mockedStripPilcrows.mockImplementation((text) => text.replace(/¶/g, "").trim());
       mockedCreateTurndownService.mockReturnValue({
         turndown: jest.fn().mockReturnValue("This is the content\n\n[Relative link](/en/dev/ref/models/fields/)"),
@@ -57,7 +67,7 @@ describe("django-docs", () => {
 
       const result = await fetchPageContent(testUrl);
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(testUrl);
+      expect(mockFetch).toHaveBeenCalledWith(testUrl);
       expect(mockedRemoveHeaderLinks).toHaveBeenCalled();
       expect(mockedResolveRelativeUrls).toHaveBeenCalled();
       expect(result.title).toBe("Models");
@@ -81,7 +91,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: htmlContent });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(htmlContent),
+      });
       mockedStripPilcrows.mockImplementation((text) => text.replace(/¶/g, "").trim());
       mockedCreateTurndownService.mockReturnValue({
         turndown: jest.fn().mockReturnValue("Content"),
@@ -104,7 +117,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: htmlContent });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(htmlContent),
+      });
       mockedStripPilcrows.mockImplementation((text) => text.replace(/¶/g, "").trim());
       mockedCreateTurndownService.mockReturnValue({
         turndown: jest.fn().mockReturnValue("Content"),
@@ -126,7 +142,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: htmlContent });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(htmlContent),
+      });
       mockedStripPilcrows.mockImplementation((text) => text.replace(/¶/g, "").trim());
       mockedCreateTurndownService.mockReturnValue({
         turndown: jest.fn().mockReturnValue("Content"),
@@ -147,7 +166,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: htmlContent });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(htmlContent),
+      });
       mockedStripPilcrows.mockImplementation((text) => text.replace(/¶/g, ""));
       mockedCreateTurndownService.mockReturnValue({
         turndown: jest.fn().mockReturnValue("Body content"),
@@ -168,7 +190,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: htmlContent });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(htmlContent),
+      });
       mockedStripPilcrows.mockImplementation((text) => text.replace(/¶/g, ""));
       mockedCreateTurndownService.mockReturnValue({
         turndown: jest.fn().mockReturnValue("Article content"),
@@ -188,7 +213,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: htmlContent });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(htmlContent),
+      });
       mockedStripPilcrows.mockImplementation((text) => text.replace(/¶/g, ""));
       mockedCreateTurndownService.mockReturnValue({
         turndown: jest.fn().mockReturnValue(""),
@@ -210,7 +238,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: htmlContent });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(htmlContent),
+      });
       mockedStripPilcrows.mockImplementation((text) => text.replace(/¶/g, "").trim());
       mockedCreateTurndownService.mockReturnValue({
         turndown: jest.fn().mockReturnValue("Content ¶"),
@@ -232,7 +263,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: htmlContent });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(htmlContent),
+      });
       mockedStripPilcrows.mockImplementation((text) => text);
       mockedCreateTurndownService.mockReturnValue({
         turndown: jest.fn().mockReturnValue("Content"),
@@ -243,8 +277,20 @@ describe("django-docs", () => {
       expect(mockedResolveRelativeUrls).toHaveBeenCalledWith(expect.anything(), testUrl);
     });
 
-    it("should handle axios errors", async () => {
-      mockedAxios.get.mockRejectedValueOnce(new Error("Network error"));
+    it("should throw error on fetch failure", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
+      });
+
+      await expect(fetchPageContent(testUrl)).rejects.toThrow(
+        `Failed to fetch ${testUrl}: 500 Internal Server Error`
+      );
+    });
+
+    it("should handle network errors", async () => {
+      mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
       await expect(fetchPageContent(testUrl)).rejects.toThrow("Network error");
     });
@@ -281,10 +327,10 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get
-        .mockResolvedValueOnce({ data: mockHtml("Models") })
-        .mockResolvedValueOnce({ data: mockHtml("Queries") })
-        .mockResolvedValueOnce({ data: mockHtml("Database") });
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml("Models")) })
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml("Queries")) })
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml("Database")) });
 
       mockedGetSectionParentUrl
         .mockReturnValueOnce("https://docs.djangoproject.com/en/dev/topics/db/")
@@ -319,9 +365,9 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get
-        .mockResolvedValueOnce({ data: mockHtml("Database") })
-        .mockResolvedValueOnce({ data: mockHtml("Models") });
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml("Database")) })
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml("Models")) });
 
       mockedGetSectionParentUrl
         .mockReturnValueOnce(null)
@@ -367,7 +413,9 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockHtml1 }).mockResolvedValueOnce({ data: mockHtml2 });
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml1) })
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml2) });
 
       mockedGetSectionParentUrl.mockReturnValue(null);
 
@@ -394,7 +442,7 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockHtml });
+      mockFetch.mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml) });
       mockedGetSectionParentUrl.mockReturnValueOnce("https://docs.djangoproject.com/en/dev/topics/db/");
 
       const entries = await fetchDocEntries();
@@ -421,7 +469,7 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: mockHtml });
+      mockFetch.mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml) });
       mockedGetSectionParentUrl.mockReturnValue(null);
 
       const entries = await fetchDocEntries();
@@ -430,9 +478,7 @@ describe("django-docs", () => {
       expect(entries[0].next).toBeNull();
     });
 
-    it("should handle errors when fetching individual pages", async () => {
-      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-
+    it("should throw error when fetching individual pages fails", async () => {
       const urls = [
         "https://docs.djangoproject.com/en/dev/topics/db/models/",
         "https://docs.djangoproject.com/en/dev/topics/db/queries/",
@@ -441,26 +487,16 @@ describe("django-docs", () => {
       mockedFetchSitemap.mockResolvedValueOnce(urls);
       mockedFilterTopicsUrls.mockReturnValueOnce(urls);
 
-      mockedAxios.get.mockRejectedValueOnce(new Error("Network error")).mockResolvedValueOnce({
-        data: `
-          <html>
-            <body>
-              <h1>Queries</h1>
-              <div id="docs-content"><p>Content</p></div>
-            </body>
-          </html>
-        `,
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
       });
 
       mockedGetSectionParentUrl.mockReturnValue(null);
 
-      const entries = await fetchDocEntries();
-
-      expect(entries).toHaveLength(1);
-      expect(entries[0].title).toBe("Queries");
-      expect(consoleErrorSpy).toHaveBeenCalledWith(`Failed to fetch ${urls[0]}:`, expect.any(Error));
-
-      consoleErrorSpy.mockRestore();
+      await expect(fetchDocEntries()).rejects.toThrow(`Failed to fetch ${urls[0]}: 500 Internal Server Error`);
+      expect(consoleErrorSpy).toHaveBeenCalled();
     });
 
     it("should handle empty sitemap", async () => {
@@ -486,31 +522,55 @@ describe("django-docs", () => {
 
     it("should maintain proper URL mapping for relationships", async () => {
       const urls = [
-        "https://docs.djangoproject.com/en/dev/topics/a/",
-        "https://docs.djangoproject.com/en/dev/topics/b/",
-        "https://docs.djangoproject.com/en/dev/topics/c/",
+        "https://docs.djangoproject.com/en/dev/topics/db/intro/",
+        "https://docs.djangoproject.com/en/dev/topics/db/models/",
+        "https://docs.djangoproject.com/en/dev/topics/db/queries/",
       ];
 
       mockedFetchSitemap.mockResolvedValueOnce(urls);
       mockedFilterTopicsUrls.mockReturnValueOnce(urls);
 
-      const mockHtml = (title: string, prev?: string, next?: string) => `
+      const mockHtml1 = `
         <html>
           <body>
             <nav aria-labelledby="browse-header">
-              ${prev ? `<a rel="prev" href="${prev}">Previous</a>` : ""}
-              ${next ? `<a rel="next" href="${next}">Next</a>` : ""}
+              <a rel="next" href="../models/">Next</a>
             </nav>
-            <h1>${title}</h1>
+            <h1>Intro</h1>
             <div id="docs-content"><p>Content</p></div>
           </body>
         </html>
       `;
 
-      mockedAxios.get
-        .mockResolvedValueOnce({ data: mockHtml("A", undefined, "../b/") })
-        .mockResolvedValueOnce({ data: mockHtml("B", "../a/", "../c/") })
-        .mockResolvedValueOnce({ data: mockHtml("C", "../b/", undefined) });
+      const mockHtml2 = `
+        <html>
+          <body>
+            <nav aria-labelledby="browse-header">
+              <a rel="prev" href="../intro/">Previous</a>
+              <a rel="next" href="../queries/">Next</a>
+            </nav>
+            <h1>Models</h1>
+            <div id="docs-content"><p>Content</p></div>
+          </body>
+        </html>
+      `;
+
+      const mockHtml3 = `
+        <html>
+          <body>
+            <nav aria-labelledby="browse-header">
+              <a rel="prev" href="../models/">Previous</a>
+            </nav>
+            <h1>Queries</h1>
+            <div id="docs-content"><p>Content</p></div>
+          </body>
+        </html>
+      `;
+
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml1) })
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml2) })
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml3) });
 
       mockedGetSectionParentUrl.mockReturnValue(null);
 
@@ -540,17 +600,17 @@ describe("django-docs", () => {
         </html>
       `;
 
-      mockedAxios.get
-        .mockResolvedValueOnce({ data: mockHtml("Models") })
-        .mockResolvedValueOnce({ data: mockHtml("Queries") });
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml("Models")) })
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml("Queries")) });
 
       mockedGetSectionParentUrl.mockReturnValue(null);
 
       await fetchDocEntries();
 
-      expect(mockedAxios.get).toHaveBeenCalledTimes(2);
-      expect(mockedAxios.get).toHaveBeenNthCalledWith(1, urls[0]);
-      expect(mockedAxios.get).toHaveBeenNthCalledWith(2, urls[1]);
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch).toHaveBeenNthCalledWith(1, urls[0]);
+      expect(mockFetch).toHaveBeenNthCalledWith(2, urls[1]);
     });
   });
 });
