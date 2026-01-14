@@ -5,7 +5,6 @@
   "description": "Navigate and search through Django documentation",
   "icon": "extension-icon.png",
   "author": "JensAstrup",
-  "contributors": ["Jens Astrup"],
   "platforms": [
     "macOS",
     "Windows"
@@ -19,12 +18,12 @@
     {
       "name": "search-documentation",
       "title": "Search Documentation",
-      "description": "Searches through the latest version's documentation",
+      "description": "Searches through the Django documentation",
       "mode": "view"
     },
     {
       "name": "refresh-docs",
-      "title": "Refresh Django Docs Cache",
+      "title": "Refresh Django Documentation Cache",
       "description": "Background job to refresh cached documentation",
       "mode": "no-view",
       "interval": "1d"
@@ -33,7 +32,6 @@
   "dependencies": {
     "@raycast/api": "1.104.1",
     "@raycast/utils": "1.17.0",
-    "axios": "1.7.9",
     "cheerio": "1.0.0",
     "turndown": "7.2.0"
   },
