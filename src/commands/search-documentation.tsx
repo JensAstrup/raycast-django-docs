@@ -67,9 +67,10 @@ export default function SearchDocumentationCommand() {
       {entries.map((entry) => (
         <List.Item
           key={entry.url}
+          id={entry.url}
           icon={Icon.Document}
           title={entry.title}
-          subtitle={entry.parent?.title ?? ""}
+          subtitle={entry.parent?.title ?? ''}
           actions={
             <ActionPanel>
               <Action.Push title="View Documentation" icon={Icon.Eye} target={<DocDetail entry={entry} />} />

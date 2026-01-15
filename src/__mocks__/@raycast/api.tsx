@@ -94,14 +94,16 @@ export const List = Object.assign(
       subtitle,
       icon,
       actions,
+      id,
     }: {
       key?: string;
       title: string;
       subtitle?: string;
       icon?: string;
       actions?: React.ReactNode;
+      id?: string;
     }) => (
-      <div data-testid="list-item" data-title={title} data-subtitle={subtitle} data-icon={icon}>
+      <div data-testid="list-item" data-title={title} data-subtitle={subtitle} data-icon={icon} data-url={id}>
         {actions}
       </div>
     ),
