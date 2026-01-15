@@ -352,16 +352,16 @@ describe("SearchDocumentationCommand", () => {
         expect(screen.getByTestId("list")).toHaveAttribute("data-loading", "false");
       });
 
-      const dropdown = screen.getByTestId('list-dropdown');
-      const options = dropdown.querySelectorAll('option');
+      const dropdown = screen.getByTestId("list-dropdown");
+      const options = dropdown.querySelectorAll("option");
       expect(options).toHaveLength(6);
 
-      expect(options[0]).toHaveAttribute('value', '6.0');
-      expect(options[1]).toHaveAttribute('value', 'dev');
-      expect(options[2]).toHaveAttribute('value', '5.2');
-      expect(options[3]).toHaveAttribute('value', '5.1');
-      expect(options[4]).toHaveAttribute('value', '5.0');
-      expect(options[5]).toHaveAttribute('value', '4.2');
+      expect(options[0]).toHaveAttribute("value", "6.0");
+      expect(options[1]).toHaveAttribute("value", "dev");
+      expect(options[2]).toHaveAttribute("value", "5.2");
+      expect(options[3]).toHaveAttribute("value", "5.1");
+      expect(options[4]).toHaveAttribute("value", "5.0");
+      expect(options[5]).toHaveAttribute("value", "4.2");
     });
 
     it("reloads docs when version changes", async () => {
