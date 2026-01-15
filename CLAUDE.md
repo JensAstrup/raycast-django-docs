@@ -22,6 +22,9 @@ src/
 
 ## Key Patterns
 
+### Strings
+- Use single quotes for strings
+
 ### View vs No-View Commands
 - **View commands** (`search-documentation.tsx`): React components with hooks
 - **No-view commands** (`refresh-docs.tsx`): Async functions, no React hooks allowed
