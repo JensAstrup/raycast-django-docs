@@ -61,16 +61,15 @@ export async function fetchDocEntries(): Promise<DocEntry[]> {
     nextUrl: string | null;
   }> = [];
 
-  for (let i = 0; i < filteredUrls.length; i++) {
-    const url = filteredUrls[i];
-
+  const rawEntries = await fetchInBatches(filteredUrls, async (url) => {
     try {
       const { title, content, prevUrl, nextUrl } = await fetchPageContent(url);
-      rawEntries.push({ url, title, content, prevUrl, nextUrl });
+      return { url, title, content, prevUrl, nextUrl };
     } catch (error) {
       console.error(`Failed to fetch ${url}:`, error);
+      return null;
     }
-  }
+  });
 
   // Create DocEntry objects with null references initially
   const entries: DocEntry[] = rawEntries.map((raw) => ({
