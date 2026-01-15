@@ -44,16 +44,13 @@ export default function SearchDocumentationCommand() {
   const VersionDropdown = () => {
     return (
       <List.Dropdown
-        tooltip="Select a version"
+        tooltip="Select a version" 
         value={version}
         onChange={(newValue: string) => setVersion(newValue as DjangoVersion)}
       >
-        <List.Dropdown.Item title="6.0" value="6.0" />
-        <List.Dropdown.Item title="dev" value="dev" />
-        <List.Dropdown.Item title="5.2" value="5.2" />
-        <List.Dropdown.Item title="5.1" value="5.1" />
-        <List.Dropdown.Item title="5.0" value="5.0" />
-        <List.Dropdown.Item title="4.2" value="4.2" />
+        {DJANGO_VERSIONS.map((ver: string) => (
+          <List.Dropdown.Item key={ver} title={ver} value={ver} />
+        ))}
       </List.Dropdown>
     );
   };

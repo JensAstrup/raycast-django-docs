@@ -1,7 +1,7 @@
 export const DJANGO_DOCS_BASE_URL = 'https://docs.djangoproject.com';
 export const SITEMAP_URL = 'https://docs.djangoproject.com/sitemap-en.xml';
-
-export const DJANGO_VERSIONS = ['6.0', 'dev', '5.2', '5.1', '5.0', '4.2'] as const;
+ 
+export const DJANGO_VERSIONS = [ 'dev', '6.0', '5.2', '5.1', '5.0', '4.2'] as const;
 export type DjangoVersion = (typeof DJANGO_VERSIONS)[number];
 
 /**
