@@ -205,7 +205,7 @@ describe("constants", () => {
       expect(DJANGO_VERSIONS).toContain("dev");
     });
 
-    it("should be a readonly array", () => {
+    it("has readonly type at compile time", () => {
       const versions = DJANGO_VERSIONS;
       expect(Object.isFrozen(versions)).toBe(false);
 

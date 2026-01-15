@@ -40,9 +40,12 @@ export function load(content: string, options?: { xmlMode?: boolean }): CheerioS
         elements.forEach((element) => element.remove());
         return selection;
       },
-      attr(name: string, value?: string): string | undefined | CheerioSelection {
+      attr(name: string, value?: string): string | CheerioSelection {
         if (value === undefined) {
-          return elements[0]?.getAttribute(name) || undefined;
+          // Not casting would violate Cheerio's API contract, which returns an empty string 
+          // "" for attributes that exist but are empty (e.g., <input disabled>), 
+          // and undefined only when the attribute doesn't exist.
+          return elements[0]?.getAttribute(name) as string;
         } else {
           elements.forEach((element) => element.setAttribute(name, value));
           return selection;
