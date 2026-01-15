@@ -555,25 +555,21 @@ describe("html-to-markdown", () => {
       });
 
       it("should not resolve empty href attributes", () => {
-        const html = '<div><a id="test-anchor">Empty</a></div>';
+        const html = '<div><a id="test-anchor" href="">Empty</a></div>';
         const $ = cheerio.load(html);
-        const anchor = $("#test-anchor")[0] as unknown as Element;
-        anchor.setAttribute("href", "");
 
         resolveRelativeUrls($, baseUrl);
 
-        expect(anchor.getAttribute("href")).toBe("");
+        expect($("#test-anchor").attr("href")).toBe("");
       });
 
       it("should not resolve empty src attributes", () => {
-        const html = '<div><img id="test-img" alt="Empty" /></div>';
+        const html = '<div><img id="test-img" src="" alt="Empty" /></div>';
         const $ = cheerio.load(html);
-        const img = $("#test-img")[0] as unknown as Element;
-        img.setAttribute("src", "");
 
         resolveRelativeUrls($, baseUrl);
 
-        expect(img.getAttribute("src")).toBe("");
+        expect($("#test-img").attr("src")).toBe("");
       });
     });
   });
