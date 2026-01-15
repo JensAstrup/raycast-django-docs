@@ -1,4 +1,4 @@
 # Django Docs Changelog
 
-## [Initial Version] - 2026-14-01
+## [1.0.0] - 2026-01-14
 - Initial Release
