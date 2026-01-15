@@ -36,7 +36,7 @@ const item = await LocalStorage.getItem<string>("key");
 Use for small data only. For large files, use Node's `fs`.
 
 ## Store Submission
-- Run `npm run build` successfully before PR
+⚠️ - Run `npm run build` _and_ `npm run fix-lint` successfully before PR ⚠️
 - README must have setup instructions
 - PRs reviewed within 1 week, marked stale after 14 days inactive
 
