@@ -357,5 +357,46 @@ describe('url-filters', () => {
         expect(parent).toBe("https://docs.djangoproject.com/en/dev/ref/topics/");
       });
     });
+
+    describe("invalid URL inputs", () => {
+      it("should return null for invalid URL strings", () => {
+        const invalidUrls = [
+          "not-a-url",
+          "://invalid",
+          "http://",
+          "just-text",
+          "",
+        ];
+
+        invalidUrls.forEach((url) => {
+          expect(getSectionParentUrl(url)).toBeNull();
+        });
+      });
+
+      it("should return null for relative URLs", () => {
+        const relativeUrls = [
+          "/en/dev/ref/class-based-views/base/",
+          "../ref/class-based-views/",
+          "./topics/auth/",
+          "ref/class-based-views/",
+        ];
+
+        relativeUrls.forEach((url) => {
+          expect(getSectionParentUrl(url)).toBeNull();
+        });
+      });
+
+      it("should return null for malformed URLs", () => {
+        const malformedUrls = [
+          "http://[invalid",
+          "https:// space.com/path",
+          "ftp://\nnewline.com/path",
+        ];
+
+        malformedUrls.forEach((url) => {
+          expect(getSectionParentUrl(url)).toBeNull();
+        });
+      });
+    });
   });
 });

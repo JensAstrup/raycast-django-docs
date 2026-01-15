@@ -56,12 +56,18 @@ export function filterUrlsBySection(
  * // Returns: null (already at top level)
  */
 export function getSectionParentUrl(url: string): string | null {
-  const parsed = new URL(url);
-  const segments = parsed.pathname.split("/").filter(Boolean);
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return null;
+  }
+
+  const segments = parsed.pathname.split('/').filter(Boolean);
   // segments: ["en", "dev", "ref", "class-based-views", "base"]
 
   // Find index of "ref" or "topics"
-  const sectionIndex = segments.findIndex((s) => s === "ref" || s === "topics");
+  const sectionIndex = segments.findIndex((s) => s === 'ref' || s === 'topics');
   if (sectionIndex === -1) return null;
 
   // Top-level = exactly one segment after ref/topics
