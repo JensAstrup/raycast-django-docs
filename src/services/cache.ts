@@ -23,48 +23,15 @@ export function readCache(version: DjangoVersion): DocEntry[] | null {
 
   try {
     const cached: CachedData = JSON.parse(data);
-
-    // Create DocEntry objects with null references initially
-    const entries: DocEntry[] = cached.entries.map((c) => ({
-      url: c.url,
-      title: c.title,
-      content: c.content,
-      parent: null,
-      previous: null,
-      next: null,
-    }));
-
-    // Build map for O(1) lookups
-    const entryByUrl = new Map<string, DocEntry>(entries.map((e) => [e.url, e]));
-
-    // Reconstruct object references from URLs
-    for (let i = 0; i < entries.length; i++) {
-      const entry = entries[i];
-      const c = cached.entries[i];
-      entry.parent = c.parentUrl ? (entryByUrl.get(c.parentUrl) ?? null) : null;
-      entry.previous = c.previousUrl ? (entryByUrl.get(c.previousUrl) ?? null) : null;
-      entry.next = c.nextUrl ? (entryByUrl.get(c.nextUrl) ?? null) : null;
-    }
-
-    return entries;
+    return deserializeEntries(cached.entries);
   } catch {
     return null;
   }
 }
 
 export function writeCache(version: DjangoVersion, entries: DocEntry[]): void {
-  // Convert to cacheable format (URLs instead of object refs)
-  const cacheable: CacheableEntry[] = entries.map((e) => ({
-    url: e.url,
-    title: e.title,
-    content: e.content,
-    parentUrl: e.parent?.url ?? null,
-    previousUrl: e.previous?.url ?? null,
-    nextUrl: e.next?.url ?? null,
-  }));
-
   const data: CachedData = {
-    entries: cacheable,
+    entries: serializeEntries(entries),
     lastRefresh: Date.now(),
   };
 

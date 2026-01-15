@@ -29,7 +29,7 @@ export function filterTopicsUrls(urls: string[], version: DjangoVersion): string
 export function filterUrlsBySection(
   urls: string[],
   version: DjangoVersion,
-  section: 'topics' | 'topicsSub' | 'ref' | 'refSub'
+  section: 'topics' | 'topicsSub' | 'ref' | 'refSub',
 ): string[] {
   const patterns = getUrlPatternsForVersion(version);
   return urls.filter((url) => patterns[section].test(url));
@@ -80,6 +80,6 @@ export function getSectionParentUrl(url: string): string | null {
 
   // Parent = url truncated to ref/<first-segment>/
   const parentSegments = segments.slice(0, sectionIndex + 2);
-  parsed.pathname = "/" + parentSegments.join("/") + "/";
+  parsed.pathname = '/' + parentSegments.join('/') + '/';
   return parsed.href;
 }

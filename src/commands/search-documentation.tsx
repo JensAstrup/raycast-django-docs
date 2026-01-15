@@ -28,13 +28,13 @@ async function loadDocEntries(version: DjangoVersion): Promise<SerializableEntry
 }
 
 export default function SearchDocumentationCommand() {
-  const [version, setVersion] = useState<DjangoVersion>("6.0");
+  const [version, setVersion] = useState<DjangoVersion>('6.0');
 
   const { data: serializedEntries = [], isLoading } = useCachedPromise(loadDocEntries, [version], {
     keepPreviousData: true,
     onError: (error) => {
-      console.error("Error loading docs:", error);
-      showToast({ style: Toast.Style.Failure, title: "Failed to load documentation" });
+      console.error('Error loading docs:', error);
+      showToast({ style: Toast.Style.Failure, title: 'Failed to load documentation' });
     },
   });
 

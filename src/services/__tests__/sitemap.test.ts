@@ -1,16 +1,16 @@
-import { fetchSitemap } from '../sitemap';
-import { SITEMAP_URL } from '../../constants';
+import { fetchSitemap } from "../sitemap";
+import { SITEMAP_URL } from "../../constants";
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
-describe('sitemap', () => {
+describe("sitemap", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('fetchSitemap', () => {
-    it('should fetch and parse URLs from sitemap', async () => {
+  describe("fetchSitemap", () => {
+    it("should fetch and parse URLs from sitemap", async () => {
       const mockSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -31,16 +31,16 @@ describe('sitemap', () => {
 
       const urls = await fetchSitemap();
 
-      expect(mockFetch).toHaveBeenCalledWith(SITEMAP_URL); 
+      expect(mockFetch).toHaveBeenCalledWith(SITEMAP_URL);
       expect(urls).toEqual([
-        'https://docs.djangoproject.com/en/dev/topics/http/',
-        'https://docs.djangoproject.com/en/dev/ref/models/',
-        'https://docs.djangoproject.com/en/dev/intro/tutorial01/',
+        "https://docs.djangoproject.com/en/dev/topics/http/",
+        "https://docs.djangoproject.com/en/dev/ref/models/",
+        "https://docs.djangoproject.com/en/dev/intro/tutorial01/",
       ]);
     });
 
-    it('should use custom sitemap URL when provided', async () => {
-      const customUrl = 'https://example.com/custom-sitemap.xml';
+    it("should use custom sitemap URL when provided", async () => {
+      const customUrl = "https://example.com/custom-sitemap.xml";
       const mockSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -56,10 +56,10 @@ describe('sitemap', () => {
       const urls = await fetchSitemap(customUrl);
 
       expect(mockFetch).toHaveBeenCalledWith(customUrl);
-      expect(urls).toEqual(['https://example.com/page1']);
+      expect(urls).toEqual(["https://example.com/page1"]);
     });
 
-    it('should return empty array when sitemap has no URLs', async () => {
+    it("should return empty array when sitemap has no URLs", async () => {
       const mockSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </urlset>`;
@@ -74,7 +74,7 @@ describe('sitemap', () => {
       expect(urls).toEqual([]);
     });
 
-    it('should handle sitemap with multiple loc elements per url', async () => {
+    it("should handle sitemap with multiple loc elements per url", async () => {
       const mockSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -96,12 +96,12 @@ describe('sitemap', () => {
       const urls = await fetchSitemap();
 
       expect(urls).toEqual([
-        'https://docs.djangoproject.com/en/dev/topics/http/',
-        'https://docs.djangoproject.com/en/dev/ref/models/',
+        "https://docs.djangoproject.com/en/dev/topics/http/",
+        "https://docs.djangoproject.com/en/dev/ref/models/",
       ]);
     });
 
-    it('should handle sitemap with whitespace in loc elements', async () => {
+    it("should handle sitemap with whitespace in loc elements", async () => {
       const mockSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -122,31 +122,31 @@ describe('sitemap', () => {
       const urls = await fetchSitemap();
 
       expect(urls).toEqual([
-        'https://docs.djangoproject.com/en/dev/topics/http/',
-        'https://docs.djangoproject.com/en/dev/ref/models/',
+        "https://docs.djangoproject.com/en/dev/topics/http/",
+        "https://docs.djangoproject.com/en/dev/ref/models/",
       ]);
     });
 
-    it('should throw error on fetch failure', async () => {
+    it("should throw error on fetch failure", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error',
+        statusText: "Internal Server Error",
       });
 
-      await expect(fetchSitemap()).rejects.toThrow('Failed to fetch sitemap: 500 Internal Server Error');
+      await expect(fetchSitemap()).rejects.toThrow("Failed to fetch sitemap: 500 Internal Server Error");
       expect(mockFetch).toHaveBeenCalledWith(SITEMAP_URL);
     });
 
-    it('should propagate network errors', async () => {
-      const error = new Error('Network error');
+    it("should propagate network errors", async () => {
+      const error = new Error("Network error");
       mockFetch.mockRejectedValueOnce(error);
 
-      await expect(fetchSitemap()).rejects.toThrow('Network error');
+      await expect(fetchSitemap()).rejects.toThrow("Network error");
       expect(mockFetch).toHaveBeenCalledWith(SITEMAP_URL);
     });
 
-    it('should handle malformed XML gracefully', async () => {
+    it("should handle malformed XML gracefully", async () => {
       const mockSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -166,10 +166,10 @@ describe('sitemap', () => {
       expect(urls.length).toBeGreaterThanOrEqual(0);
     });
 
-    it('should handle empty response', async () => {
+    it("should handle empty response", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        text: () => Promise.resolve(''),
+        text: () => Promise.resolve(""),
       });
 
       const urls = await fetchSitemap();
@@ -177,11 +177,11 @@ describe('sitemap', () => {
       expect(urls).toEqual([]);
     });
 
-    it('should handle large sitemaps with many URLs', async () => {
+    it("should handle large sitemaps with many URLs", async () => {
       const urls = Array.from({ length: 1000 }, (_, i) => `https://example.com/page${i}`);
       const mockSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((url) => `  <url><loc>${url}</loc></url>`).join('\n')}
+${urls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}
 </urlset>`;
 
       mockFetch.mockResolvedValueOnce({
@@ -192,8 +192,8 @@ ${urls.map((url) => `  <url><loc>${url}</loc></url>`).join('\n')}
       const result = await fetchSitemap();
 
       expect(result).toHaveLength(1000);
-      expect(result[0]).toBe('https://example.com/page0');
-      expect(result[999]).toBe('https://example.com/page999');
+      expect(result[0]).toBe("https://example.com/page0");
+      expect(result[999]).toBe("https://example.com/page999");
     });
   });
 });

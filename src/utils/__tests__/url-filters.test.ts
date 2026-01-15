@@ -1,214 +1,214 @@
-import { filterTopicsUrls, filterUrlsBySection, getSectionParentUrl } from '../url-filters';
+import { filterTopicsUrls, filterUrlsBySection, getSectionParentUrl } from "../url-filters";
 
-describe('url-filters', () => {
-  describe('filterTopicsUrls', () => {
-    it('should filter URLs matching any pattern for dev version', () => {
+describe("url-filters", () => {
+  describe("filterTopicsUrls", () => {
+    it("should filter URLs matching any pattern for dev version", () => {
       const urls = [
-        'https://docs.djangoproject.com/en/dev/topics/auth/',
-        'https://docs.djangoproject.com/en/dev/topics/db/models/',
-        'https://docs.djangoproject.com/en/dev/ref/contrib/admin/',
-        'https://docs.djangoproject.com/en/dev/ref/forms/api/fields/',
-        'https://docs.djangoproject.com/en/dev/intro/tutorial01/',
-        'https://example.com/',
+        "https://docs.djangoproject.com/en/dev/topics/auth/",
+        "https://docs.djangoproject.com/en/dev/topics/db/models/",
+        "https://docs.djangoproject.com/en/dev/ref/contrib/admin/",
+        "https://docs.djangoproject.com/en/dev/ref/forms/api/fields/",
+        "https://docs.djangoproject.com/en/dev/intro/tutorial01/",
+        "https://example.com/",
       ];
 
-      const filtered = filterTopicsUrls(urls, 'dev');
+      const filtered = filterTopicsUrls(urls, "dev");
 
       expect(filtered).toHaveLength(4);
-      expect(filtered).toContain('https://docs.djangoproject.com/en/dev/topics/auth/');
-      expect(filtered).toContain('https://docs.djangoproject.com/en/dev/topics/db/models/');
-      expect(filtered).toContain('https://docs.djangoproject.com/en/dev/ref/contrib/admin/');
-      expect(filtered).toContain('https://docs.djangoproject.com/en/dev/ref/forms/api/fields/');
-      expect(filtered).not.toContain('https://docs.djangoproject.com/en/dev/intro/tutorial01/');
-      expect(filtered).not.toContain('https://example.com/');
+      expect(filtered).toContain("https://docs.djangoproject.com/en/dev/topics/auth/");
+      expect(filtered).toContain("https://docs.djangoproject.com/en/dev/topics/db/models/");
+      expect(filtered).toContain("https://docs.djangoproject.com/en/dev/ref/contrib/admin/");
+      expect(filtered).toContain("https://docs.djangoproject.com/en/dev/ref/forms/api/fields/");
+      expect(filtered).not.toContain("https://docs.djangoproject.com/en/dev/intro/tutorial01/");
+      expect(filtered).not.toContain("https://example.com/");
     });
 
-    it('should filter URLs for specific version 6.0', () => {
+    it("should filter URLs for specific version 6.0", () => {
       const urls = [
-        'https://docs.djangoproject.com/en/6.0/topics/auth/',
-        'https://docs.djangoproject.com/en/dev/topics/auth/',
-        'https://docs.djangoproject.com/en/5.1/topics/auth/',
+        "https://docs.djangoproject.com/en/6.0/topics/auth/",
+        "https://docs.djangoproject.com/en/dev/topics/auth/",
+        "https://docs.djangoproject.com/en/5.1/topics/auth/",
       ];
 
-      const filtered = filterTopicsUrls(urls, '6.0');
+      const filtered = filterTopicsUrls(urls, "6.0");
 
       expect(filtered).toHaveLength(1);
-      expect(filtered).toContain('https://docs.djangoproject.com/en/6.0/topics/auth/');
+      expect(filtered).toContain("https://docs.djangoproject.com/en/6.0/topics/auth/");
     });
 
-    it('should return empty array when no URLs match', () => {
+    it("should return empty array when no URLs match", () => {
       const urls = [
-        'https://docs.djangoproject.com/en/dev/intro/tutorial01/',
-        'https://example.com/',
-        'https://docs.djangoproject.com/',
+        "https://docs.djangoproject.com/en/dev/intro/tutorial01/",
+        "https://example.com/",
+        "https://docs.djangoproject.com/",
       ];
 
-      const filtered = filterTopicsUrls(urls, 'dev');
+      const filtered = filterTopicsUrls(urls, "dev");
 
       expect(filtered).toEqual([]);
     });
 
-    it('should handle empty input array', () => {
-      const filtered = filterTopicsUrls([], 'dev');
+    it("should handle empty input array", () => {
+      const filtered = filterTopicsUrls([], "dev");
       expect(filtered).toEqual([]);
     });
 
-    it('should match all pattern types', () => {
+    it("should match all pattern types", () => {
       const urls = [
-        'https://docs.djangoproject.com/en/dev/topics/auth/',
-        'https://docs.djangoproject.com/en/dev/topics/auth/default/',
-        'https://docs.djangoproject.com/en/dev/ref/contrib/admin/',
-        'https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/',
+        "https://docs.djangoproject.com/en/dev/topics/auth/",
+        "https://docs.djangoproject.com/en/dev/topics/auth/default/",
+        "https://docs.djangoproject.com/en/dev/ref/contrib/admin/",
+        "https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/",
       ];
 
-      const filtered = filterTopicsUrls(urls, 'dev');
+      const filtered = filterTopicsUrls(urls, "dev");
 
       expect(filtered).toHaveLength(4);
     });
 
-    it('should preserve original order of matching URLs', () => {
+    it("should preserve original order of matching URLs", () => {
       const urls = [
-        'https://docs.djangoproject.com/en/dev/ref/contrib/admin/',
-        'https://example.com/',
-        'https://docs.djangoproject.com/en/dev/topics/auth/',
-        'https://docs.djangoproject.com/en/dev/topics/db/models/',
+        "https://docs.djangoproject.com/en/dev/ref/contrib/admin/",
+        "https://example.com/",
+        "https://docs.djangoproject.com/en/dev/topics/auth/",
+        "https://docs.djangoproject.com/en/dev/topics/db/models/",
       ];
 
-      const filtered = filterTopicsUrls(urls, 'dev');
+      const filtered = filterTopicsUrls(urls, "dev");
 
       expect(filtered).toEqual([
-        'https://docs.djangoproject.com/en/dev/ref/contrib/admin/',
-        'https://docs.djangoproject.com/en/dev/topics/auth/',
-        'https://docs.djangoproject.com/en/dev/topics/db/models/',
+        "https://docs.djangoproject.com/en/dev/ref/contrib/admin/",
+        "https://docs.djangoproject.com/en/dev/topics/auth/",
+        "https://docs.djangoproject.com/en/dev/topics/db/models/",
       ]);
     });
 
-    it('should handle URLs with and without trailing slashes', () => {
+    it("should handle URLs with and without trailing slashes", () => {
       const urls = [
-        'https://docs.djangoproject.com/en/dev/topics/auth',
-        'https://docs.djangoproject.com/en/dev/topics/db/',
+        "https://docs.djangoproject.com/en/dev/topics/auth",
+        "https://docs.djangoproject.com/en/dev/topics/db/",
       ];
 
-      const filtered = filterTopicsUrls(urls, 'dev');
+      const filtered = filterTopicsUrls(urls, "dev");
 
       expect(filtered).toHaveLength(2);
     });
   });
 
-  describe('filterUrlsBySection', () => {
-    describe('topics section', () => {
-      it('should filter only topics URLs', () => {
+  describe("filterUrlsBySection", () => {
+    describe("topics section", () => {
+      it("should filter only topics URLs", () => {
         const urls = [
-          'https://docs.djangoproject.com/en/dev/topics/auth/',
-          'https://docs.djangoproject.com/en/dev/topics/db/',
-          'https://docs.djangoproject.com/en/dev/topics/auth/default/',
-          'https://docs.djangoproject.com/en/dev/ref/contrib/admin/',
+          "https://docs.djangoproject.com/en/dev/topics/auth/",
+          "https://docs.djangoproject.com/en/dev/topics/db/",
+          "https://docs.djangoproject.com/en/dev/topics/auth/default/",
+          "https://docs.djangoproject.com/en/dev/ref/contrib/admin/",
         ];
 
-        const filtered = filterUrlsBySection(urls, 'dev', 'topics');
+        const filtered = filterUrlsBySection(urls, "dev", "topics");
 
         expect(filtered).toHaveLength(2);
-        expect(filtered).toContain('https://docs.djangoproject.com/en/dev/topics/auth/');
-        expect(filtered).toContain('https://docs.djangoproject.com/en/dev/topics/db/');
-        expect(filtered).not.toContain('https://docs.djangoproject.com/en/dev/ref/contrib/admin/');
+        expect(filtered).toContain("https://docs.djangoproject.com/en/dev/topics/auth/");
+        expect(filtered).toContain("https://docs.djangoproject.com/en/dev/topics/db/");
+        expect(filtered).not.toContain("https://docs.djangoproject.com/en/dev/ref/contrib/admin/");
       });
     });
 
-    describe('topicsSub section', () => {
-      it('should filter only topicsSub URLs', () => {
+    describe("topicsSub section", () => {
+      it("should filter only topicsSub URLs", () => {
         const urls = [
-          'https://docs.djangoproject.com/en/dev/topics/auth/',
-          'https://docs.djangoproject.com/en/dev/topics/auth/default/',
-          'https://docs.djangoproject.com/en/dev/topics/db/models/',
-          'https://docs.djangoproject.com/en/dev/ref/contrib/admin/',
+          "https://docs.djangoproject.com/en/dev/topics/auth/",
+          "https://docs.djangoproject.com/en/dev/topics/auth/default/",
+          "https://docs.djangoproject.com/en/dev/topics/db/models/",
+          "https://docs.djangoproject.com/en/dev/ref/contrib/admin/",
         ];
 
-        const filtered = filterUrlsBySection(urls, 'dev', 'topicsSub');
+        const filtered = filterUrlsBySection(urls, "dev", "topicsSub");
 
         expect(filtered).toHaveLength(2);
-        expect(filtered).toContain('https://docs.djangoproject.com/en/dev/topics/auth/default/');
-        expect(filtered).toContain('https://docs.djangoproject.com/en/dev/topics/db/models/');
+        expect(filtered).toContain("https://docs.djangoproject.com/en/dev/topics/auth/default/");
+        expect(filtered).toContain("https://docs.djangoproject.com/en/dev/topics/db/models/");
       });
     });
 
-    describe('ref section', () => {
-      it('should filter only ref URLs', () => {
+    describe("ref section", () => {
+      it("should filter only ref URLs", () => {
         const urls = [
-          'https://docs.djangoproject.com/en/dev/ref/contrib/admin/',
-          'https://docs.djangoproject.com/en/dev/ref/forms/api/',
-          'https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/',
-          'https://docs.djangoproject.com/en/dev/topics/auth/',
+          "https://docs.djangoproject.com/en/dev/ref/contrib/admin/",
+          "https://docs.djangoproject.com/en/dev/ref/forms/api/",
+          "https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/",
+          "https://docs.djangoproject.com/en/dev/topics/auth/",
         ];
 
-        const filtered = filterUrlsBySection(urls, 'dev', 'ref');
+        const filtered = filterUrlsBySection(urls, "dev", "ref");
 
         expect(filtered).toHaveLength(2);
-        expect(filtered).toContain('https://docs.djangoproject.com/en/dev/ref/contrib/admin/');
-        expect(filtered).toContain('https://docs.djangoproject.com/en/dev/ref/forms/api/');
+        expect(filtered).toContain("https://docs.djangoproject.com/en/dev/ref/contrib/admin/");
+        expect(filtered).toContain("https://docs.djangoproject.com/en/dev/ref/forms/api/");
       });
     });
 
-    describe('refSub section', () => {
-      it('should filter only refSub URLs', () => {
+    describe("refSub section", () => {
+      it("should filter only refSub URLs", () => {
         const urls = [
-          'https://docs.djangoproject.com/en/dev/ref/contrib/admin/',
-          'https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/',
-          'https://docs.djangoproject.com/en/dev/ref/forms/api/fields/',
-          'https://docs.djangoproject.com/en/dev/topics/auth/',
+          "https://docs.djangoproject.com/en/dev/ref/contrib/admin/",
+          "https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/",
+          "https://docs.djangoproject.com/en/dev/ref/forms/api/fields/",
+          "https://docs.djangoproject.com/en/dev/topics/auth/",
         ];
 
-        const filtered = filterUrlsBySection(urls, 'dev', 'refSub');
+        const filtered = filterUrlsBySection(urls, "dev", "refSub");
 
         expect(filtered).toHaveLength(2);
-        expect(filtered).toContain('https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/');
-        expect(filtered).toContain('https://docs.djangoproject.com/en/dev/ref/forms/api/fields/');
+        expect(filtered).toContain("https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/");
+        expect(filtered).toContain("https://docs.djangoproject.com/en/dev/ref/forms/api/fields/");
       });
     });
 
-    it('should return empty array when no URLs match section', () => {
-      const urls = ['https://docs.djangoproject.com/en/dev/intro/tutorial01/', 'https://example.com/'];
+    it("should return empty array when no URLs match section", () => {
+      const urls = ["https://docs.djangoproject.com/en/dev/intro/tutorial01/", "https://example.com/"];
 
-      const filtered = filterUrlsBySection(urls, 'dev', 'topics');
+      const filtered = filterUrlsBySection(urls, "dev", "topics");
 
       expect(filtered).toEqual([]);
     });
 
-    it('should handle empty input array', () => {
-      const filtered = filterUrlsBySection([], 'dev', 'topics');
+    it("should handle empty input array", () => {
+      const filtered = filterUrlsBySection([], "dev", "topics");
       expect(filtered).toEqual([]);
     });
 
-    it('should preserve original order', () => {
+    it("should preserve original order", () => {
       const urls = [
-        'https://docs.djangoproject.com/en/dev/topics/db/',
-        'https://example.com/',
-        'https://docs.djangoproject.com/en/dev/topics/auth/',
-        'https://docs.djangoproject.com/en/dev/topics/http/',
+        "https://docs.djangoproject.com/en/dev/topics/db/",
+        "https://example.com/",
+        "https://docs.djangoproject.com/en/dev/topics/auth/",
+        "https://docs.djangoproject.com/en/dev/topics/http/",
       ];
 
-      const filtered = filterUrlsBySection(urls, 'dev', 'topics');
+      const filtered = filterUrlsBySection(urls, "dev", "topics");
 
       expect(filtered).toEqual([
-        'https://docs.djangoproject.com/en/dev/topics/db/',
-        'https://docs.djangoproject.com/en/dev/topics/auth/',
-        'https://docs.djangoproject.com/en/dev/topics/http/',
+        "https://docs.djangoproject.com/en/dev/topics/db/",
+        "https://docs.djangoproject.com/en/dev/topics/auth/",
+        "https://docs.djangoproject.com/en/dev/topics/http/",
       ]);
     });
 
-    it('should filter by version correctly', () => {
+    it("should filter by version correctly", () => {
       const urls = [
-        'https://docs.djangoproject.com/en/6.0/topics/auth/',
-        'https://docs.djangoproject.com/en/5.1/topics/auth/',
-        'https://docs.djangoproject.com/en/dev/topics/auth/',
+        "https://docs.djangoproject.com/en/6.0/topics/auth/",
+        "https://docs.djangoproject.com/en/5.1/topics/auth/",
+        "https://docs.djangoproject.com/en/dev/topics/auth/",
       ];
 
-      const filtered60 = filterUrlsBySection(urls, '6.0', 'topics');
-      const filtered51 = filterUrlsBySection(urls, '5.1', 'topics');
+      const filtered60 = filterUrlsBySection(urls, "6.0", "topics");
+      const filtered51 = filterUrlsBySection(urls, "5.1", "topics");
 
       expect(filtered60).toHaveLength(1);
-      expect(filtered60).toContain('https://docs.djangoproject.com/en/6.0/topics/auth/');
+      expect(filtered60).toContain("https://docs.djangoproject.com/en/6.0/topics/auth/");
       expect(filtered51).toHaveLength(1);
-      expect(filtered51).toContain('https://docs.djangoproject.com/en/5.1/topics/auth/');
+      expect(filtered51).toContain("https://docs.djangoproject.com/en/5.1/topics/auth/");
     });
   });
 
