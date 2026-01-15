@@ -309,7 +309,7 @@ describe("RefreshDocsCommand", () => {
       expect(mockedFetchDocEntries).toHaveBeenCalledTimes(DJANGO_VERSIONS.length);
     });
 
-    it('handles all versions with different cache states', async () => {
+    it("handles all versions with different cache states", async () => {
       mockedShouldRefresh
         .mockReturnValueOnce(true) // 6.0 - refresh
         .mockReturnValueOnce(false) // dev - skip
