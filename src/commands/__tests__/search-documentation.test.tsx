@@ -484,6 +484,11 @@ describe("SearchDocumentationCommand", () => {
 
       const listItems = screen.getAllByTestId("list-item");
       expect(listItems).toHaveLength(4);
+
+      // Verify each list item exposes the correct URL from mockEntries
+      listItems.forEach((item, index) => {
+        expect(item).toHaveAttribute("data-url", mockEntries[index].url);
+      });
     });
   });
 
