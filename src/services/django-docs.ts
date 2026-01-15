@@ -18,6 +18,28 @@ interface PageContent {
   nextUrl: string | null;
 }
 
+/**
+ * Processes items in parallel batches to avoid overwhelming the server
+ * while still achieving better performance than sequential processing.
+ *
+ * @param items - Array of items to process
+ * @param mapper - Async function that processes each item
+ * @param batchSize - Number of items to process concurrently (default: 10)
+ * @returns Array of results in the same order as input items
+ */
+async function fetchInBatches<T, R>(items: T[], mapper: (item: T) => Promise<R>, batchSize: number = 10): Promise<R[]> {
+  const results: R[] = [];
+
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchPromises = batch.map((item) => mapper(item));
+    const batchResults = await Promise.all(batchPromises);
+    results.push(...batchResults);
+  }
+
+  return results;
+}
+
 export async function fetchPageContent(url: string): Promise<PageContent> {
   const response = await fetch(url);
   if (!response.ok) {
@@ -56,15 +78,6 @@ export async function fetchPageContent(url: string): Promise<PageContent> {
 export async function fetchDocEntries(version: DjangoVersion): Promise<DocEntry[]> {
   const allUrls = await fetchSitemap();
   const filteredUrls = filterTopicsUrls(allUrls, version);
-
-  // Temporary storage for entries with raw URLs before linking
-  const rawEntries: Array<{
-    url: string;
-    title: string;
-    content: string;
-    prevUrl: string | null;
-    nextUrl: string | null;
-  }> = [];
 
   const rawEntries = await fetchInBatches(filteredUrls, async (url) => {
     try {
