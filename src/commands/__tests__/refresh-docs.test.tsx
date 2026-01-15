@@ -309,13 +309,14 @@ describe("RefreshDocsCommand", () => {
       expect(mockedFetchDocEntries).toHaveBeenCalledTimes(DJANGO_VERSIONS.length);
     });
 
-    it("handles all versions with different cache states", async () => {
+    it('handles all versions with different cache states', async () => {
       mockedShouldRefresh
-        .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
-        .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
-        .mockReturnValueOnce(true);
+        .mockReturnValueOnce(true) // 6.0 - refresh
+        .mockReturnValueOnce(false) // dev - skip
+        .mockReturnValueOnce(true) // 5.2 - refresh
+        .mockReturnValueOnce(false) // 5.1 - skip
+        .mockReturnValueOnce(true) // 5.0 - refresh
+        .mockReturnValueOnce(false); // 4.2 - skip
 
       await RefreshDocsCommand({
         launchType: LaunchType.UserInitiated,

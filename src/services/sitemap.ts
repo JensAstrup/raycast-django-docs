@@ -11,7 +11,7 @@ export async function fetchSitemap(sitemapUrl: string = SITEMAP_URL): Promise<st
   const urls: string[] = [];
 
   $("url loc").each((_, element) => {
-    urls.push($(element).text());
+    urls.push($(element).text().trim());
   });
 
   return urls;

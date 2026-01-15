@@ -335,14 +335,14 @@ describe("django-docs", () => {
         .mockReturnValueOnce("https://docs.djangoproject.com/en/dev/topics/db/")
         .mockReturnValueOnce(null);
 
-      const entries = await fetchDocEntries();
+      const entries = await fetchDocEntries('dev');
 
       expect(mockedFetchSitemap).toHaveBeenCalled();
-      expect(mockedFilterTopicsUrls).toHaveBeenCalled();
+      expect(mockedFilterTopicsUrls).toHaveBeenCalledWith(expect.any(Array), 'dev');
       expect(entries).toHaveLength(3);
-      expect(entries[0].title).toBe("Models");
-      expect(entries[1].title).toBe("Queries");
-      expect(entries[2].title).toBe("Database");
+      expect(entries[0].title).toBe('Models');
+      expect(entries[1].title).toBe('Queries');
+      expect(entries[2].title).toBe('Database');
     });
 
     it("should establish parent-child relationships correctly", async () => {
@@ -371,7 +371,7 @@ describe("django-docs", () => {
         .mockReturnValueOnce(null)
         .mockReturnValueOnce("https://docs.djangoproject.com/en/dev/topics/db/");
 
-      const entries = await fetchDocEntries();
+      const entries = await fetchDocEntries('dev');
 
       expect(entries[0].parent).toBeNull();
       expect(entries[1].parent?.url).toBe(entries[0].url);
@@ -417,7 +417,7 @@ describe("django-docs", () => {
 
       mockedGetSectionParentUrl.mockReturnValue(null);
 
-      const entries = await fetchDocEntries();
+      const entries = await fetchDocEntries('dev');
 
       expect(entries[0].next?.url).toBe(entries[1].url);
       expect(entries[0].next?.title).toBe(entries[1].title);
@@ -443,7 +443,7 @@ describe("django-docs", () => {
       mockFetch.mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml) });
       mockedGetSectionParentUrl.mockReturnValueOnce("https://docs.djangoproject.com/en/dev/topics/db/");
 
-      const entries = await fetchDocEntries();
+      const entries = await fetchDocEntries('dev');
 
       expect(entries[0].parent).toBeNull();
     });
@@ -470,7 +470,7 @@ describe("django-docs", () => {
       mockFetch.mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockHtml) });
       mockedGetSectionParentUrl.mockReturnValue(null);
 
-      const entries = await fetchDocEntries();
+      const entries = await fetchDocEntries('dev');
 
       expect(entries[0].previous).toBeNull();
       expect(entries[0].next).toBeNull();
@@ -493,7 +493,7 @@ describe("django-docs", () => {
 
       mockedGetSectionParentUrl.mockReturnValue(null);
 
-      await expect(fetchDocEntries()).rejects.toThrow(`Failed to fetch ${urls[0]}: 500 Internal Server Error`);
+      await expect(fetchDocEntries('dev')).rejects.toThrow(`Failed to fetch ${urls[0]}: 500 Internal Server Error`);
       expect(consoleErrorSpy).toHaveBeenCalled();
     });
 
@@ -501,7 +501,7 @@ describe("django-docs", () => {
       mockedFetchSitemap.mockResolvedValueOnce([]);
       mockedFilterTopicsUrls.mockReturnValueOnce([]);
 
-      const entries = await fetchDocEntries();
+      const entries = await fetchDocEntries('dev');
 
       expect(entries).toHaveLength(0);
     });
@@ -513,7 +513,7 @@ describe("django-docs", () => {
       ]);
       mockedFilterTopicsUrls.mockReturnValueOnce([]);
 
-      const entries = await fetchDocEntries();
+      const entries = await fetchDocEntries('dev');
 
       expect(entries).toHaveLength(0);
     });
@@ -572,7 +572,7 @@ describe("django-docs", () => {
 
       mockedGetSectionParentUrl.mockReturnValue(null);
 
-      const entries = await fetchDocEntries();
+      const entries = await fetchDocEntries('dev');
 
       expect(entries[0].next?.url).toBe(entries[1].url);
       expect(entries[1].previous?.url).toBe(entries[0].url);
@@ -604,7 +604,7 @@ describe("django-docs", () => {
 
       mockedGetSectionParentUrl.mockReturnValue(null);
 
-      await fetchDocEntries();
+      await fetchDocEntries('dev');
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(mockFetch).toHaveBeenNthCalledWith(1, urls[0]);

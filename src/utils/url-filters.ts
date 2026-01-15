@@ -1,28 +1,38 @@
-import { URL_PATTERNS } from "../constants";
+import { getUrlPatternsForVersion, DjangoVersion } from '../constants';
 
 /**
- * Filters a list of URLs to only include those matching our documentation patterns.
+ * Filters a list of URLs to only include those matching our documentation patterns
+ * for a specific Django version.
  *
  * The Django sitemap contains thousands of URLs across all versions and sections.
  * We only want specific sections (topics, ref) at specific depths to keep the
- * extension focused and performant. The patterns are defined in constants.ts.
+ * extension focused and performant. The patterns are generated based on the version.
  *
  * @param urls - Array of URLs from the Django sitemap
- * @returns URLs that match any of our defined documentation patterns
+ * @param version - The Django version to filter for
+ * @returns URLs that match any of our defined documentation patterns for the given version
  */
-export function filterTopicsUrls(urls: string[]): string[] {
-  return urls.filter((url) => Object.values(URL_PATTERNS).some((pattern) => pattern.test(url)));
+export function filterTopicsUrls(urls: string[], version: DjangoVersion): string[] {
+  const patterns = getUrlPatternsForVersion(version);
+  return urls.filter((url) => Object.values(patterns).some((pattern) => pattern.test(url)));
 }
 
 /**
- * Filters URLs to only include those matching a specific documentation section.
+ * Filters URLs to only include those matching a specific documentation section
+ * for a specific Django version.
  *
  * @param urls - Array of URLs to filter
+ * @param version - The Django version to filter for
  * @param section - The section key from URL_PATTERNS (e.g., "topics", "ref")
  * @returns URLs matching the specified section pattern
  */
-export function filterUrlsBySection(urls: string[], section: keyof typeof URL_PATTERNS): string[] {
-  return urls.filter((url) => URL_PATTERNS[section].test(url));
+export function filterUrlsBySection(
+  urls: string[],
+  version: DjangoVersion,
+  section: 'topics' | 'topicsSub' | 'ref' | 'refSub'
+): string[] {
+  const patterns = getUrlPatternsForVersion(version);
+  return urls.filter((url) => patterns[section].test(url));
 }
 
 /**

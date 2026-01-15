@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { showToast, Toast } from "@raycast/api";
 import SearchDocumentationCommand from "../search-documentation";
 import { fetchDocEntries } from "../../services/django-docs";
@@ -306,19 +306,24 @@ describe("SearchDocumentationCommand", () => {
     });
 
     it("does not write to cache when fetch fails", async () => {
-      mockedReadCache.mockReturnValue(null);
-      mockedFetchDocEntries.mockRejectedValue(new Error("Network error"));
+      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+      try {
+        mockedReadCache.mockReturnValue(null);
+        mockedFetchDocEntries.mockRejectedValue(new Error("Network error"));
 
-      render(<SearchDocumentationCommand />);
+        render(<SearchDocumentationCommand />);
 
-      await waitFor(() => {
-        expect(mockedShowToast).toHaveBeenCalledWith({
-          style: Toast.Style.Failure,
-          title: "Failed to load documentation",
+        await waitFor(() => {
+          expect(mockedShowToast).toHaveBeenCalledWith({
+            style: Toast.Style.Failure,
+            title: "Failed to load documentation",
+          });
         });
-      });
 
-      expect(mockedWriteCache).not.toHaveBeenCalled();
+        expect(mockedWriteCache).not.toHaveBeenCalled();
+      } finally {
+        consoleErrorSpy.mockRestore();
+      }
     });
   });
 
@@ -347,15 +352,16 @@ describe("SearchDocumentationCommand", () => {
         expect(screen.getByTestId("list")).toHaveAttribute("data-loading", "false");
       });
 
-      const dropdown = screen.getByTestId("list-dropdown");
-      const options = dropdown.querySelectorAll("option");
-      expect(options).toHaveLength(5);
+      const dropdown = screen.getByTestId('list-dropdown');
+      const options = dropdown.querySelectorAll('option');
+      expect(options).toHaveLength(6);
 
-      expect(options[0]).toHaveAttribute("value", "6.0");
-      expect(options[1]).toHaveAttribute("value", "dev");
-      expect(options[2]).toHaveAttribute("value", "5.1");
-      expect(options[3]).toHaveAttribute("value", "5.0");
-      expect(options[4]).toHaveAttribute("value", "4.2");
+      expect(options[0]).toHaveAttribute('value', '6.0');
+      expect(options[1]).toHaveAttribute('value', 'dev');
+      expect(options[2]).toHaveAttribute('value', '5.2');
+      expect(options[3]).toHaveAttribute('value', '5.1');
+      expect(options[4]).toHaveAttribute('value', '5.0');
+      expect(options[5]).toHaveAttribute('value', '4.2');
     });
 
     it("reloads docs when version changes", async () => {
@@ -367,7 +373,22 @@ describe("SearchDocumentationCommand", () => {
         expect(screen.getByTestId("list")).toHaveAttribute("data-loading", "false");
       });
 
+      // Initial load should read cache with default version
       expect(mockedReadCache).toHaveBeenCalledWith("6.0");
+      expect(mockedReadCache).toHaveBeenCalledTimes(1);
+
+      // Change version via dropdown
+      const dropdown = screen.getByTestId("list-dropdown");
+      fireEvent.change(dropdown, { target: { value: "5.1" } });
+
+      // Wait for the UI to settle after version change
+      await waitFor(() => {
+        expect(screen.getByTestId("list")).toHaveAttribute("data-loading", "false");
+      });
+
+      // Verify readCache was called again with the new version
+      expect(mockedReadCache).toHaveBeenCalledWith("5.1");
+      expect(mockedReadCache).toHaveBeenCalledTimes(2);
     });
   });
 

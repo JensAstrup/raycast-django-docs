@@ -67,8 +67,8 @@ async function loadDocEntries(version: DjangoVersion): Promise<SerializableEntry
   }
 
   // No cache - fetch fresh
-  const toast = await showToast({ style: Toast.Style.Animated, title: "Fetching documentation..." });
-  const docEntries = await fetchDocEntries();
+  const toast = await showToast({ style: Toast.Style.Animated, title: 'Fetching documentation...' });
+  const docEntries = await fetchDocEntries(version);
   toast.hide();
 
   // Write to cache
@@ -101,6 +101,7 @@ export default function SearchDocumentationCommand() {
       >
         <List.Dropdown.Item title="6.0" value="6.0" />
         <List.Dropdown.Item title="dev" value="dev" />
+        <List.Dropdown.Item title="5.2" value="5.2" />
         <List.Dropdown.Item title="5.1" value="5.1" />
         <List.Dropdown.Item title="5.0" value="5.0" />
         <List.Dropdown.Item title="4.2" value="4.2" />

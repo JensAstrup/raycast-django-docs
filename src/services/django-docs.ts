@@ -1,14 +1,15 @@
-import * as cheerio from "cheerio";
-import { DocEntry } from "../types/DocEntry";
-import { fetchSitemap } from "./sitemap";
-import { filterTopicsUrls, getSectionParentUrl } from "../utils/url-filters";
+import * as cheerio from 'cheerio';
+import { DocEntry } from '../types/DocEntry';
+import { DjangoVersion } from '../constants';
+import { fetchSitemap } from './sitemap';
+import { filterTopicsUrls, getSectionParentUrl } from '../utils/url-filters';
 import {
   createTurndownService,
   resolveRelativeUrls,
   removeHeaderLinks,
   stripPilcrows,
-} from "../utils/html-to-markdown";
-import { showToast, Toast } from "@raycast/api";
+} from '../utils/html-to-markdown';
+import { showToast, Toast } from '@raycast/api';
 
 interface PageContent {
   title: string;
@@ -52,9 +53,9 @@ export async function fetchPageContent(url: string): Promise<PageContent> {
   return { title, content: markdown, prevUrl, nextUrl };
 }
 
-export async function fetchDocEntries(): Promise<DocEntry[]> {
+export async function fetchDocEntries(version: DjangoVersion): Promise<DocEntry[]> {
   const allUrls = await fetchSitemap();
-  const filteredUrls = filterTopicsUrls(allUrls);
+  const filteredUrls = filterTopicsUrls(allUrls, version);
 
   // Temporary storage for entries with raw URLs before linking
   const rawEntries: Array<{

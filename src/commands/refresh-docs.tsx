@@ -41,7 +41,7 @@ export default async function RefreshDocsCommand(props: { launchType: LaunchType
       }
 
       // Fetch fresh documentation
-      const entries = await fetchDocEntries();
+      const entries = await fetchDocEntries(version);
 
       // Write to cache
       writeCache(version, entries);

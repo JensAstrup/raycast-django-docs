@@ -1,12 +1,21 @@
-export const DJANGO_DOCS_BASE_URL = "https://docs.djangoproject.com";
-export const SITEMAP_URL = "https://docs.djangoproject.com/sitemap-en.xml";
+export const DJANGO_DOCS_BASE_URL = 'https://docs.djangoproject.com';
+export const SITEMAP_URL = 'https://docs.djangoproject.com/sitemap-en.xml';
 
-export const URL_PATTERNS = {
-  topics: /^https:\/\/docs\.djangoproject\.com\/en\/dev\/topics\/[^/]+\/?$/, // e.g. https://docs.djangoproject.com/en/dev/topics/http/requests/
-  topicsSub: /^https:\/\/docs\.djangoproject\.com\/en\/dev\/topics\/[^/]+\/[^/]+\/?$/, // e.g. https://docs.djangoproject.com/en/dev/topics/http/requests/sub/
-  ref: /^https:\/\/docs\.djangoproject\.com\/en\/dev\/ref\/[^/]+\/[^/]+\/?$/, // e.g. https://docs.djangoproject.com/en/dev/ref/contrib/auth/
-  refSub: /^https:\/\/docs\.djangoproject\.com\/en\/dev\/ref\/[^/]+\/[^/]+\/[^/]+\/?$/, // e.g. https://docs.djangoproject.com/en/dev/ref/contrib/auth/sub/
-};
-
-export const DJANGO_VERSIONS = ["6.0", "dev", "5.2", "5.1", "5.0", "4.2"] as const;
+export const DJANGO_VERSIONS = ['6.0', 'dev', '5.2', '5.1', '5.0', '4.2'] as const;
 export type DjangoVersion = (typeof DJANGO_VERSIONS)[number];
+
+/**
+ * Generates URL patterns for filtering Django documentation URLs by version.
+ *
+ * @param version - The Django version (e.g., "6.0", "dev", "5.1")
+ * @returns Object containing regex patterns for topics and ref sections
+ */
+export function getUrlPatternsForVersion(version: DjangoVersion) {
+  const escapedVersion = version.replace('.', '\\.');
+  return {
+    topics: new RegExp(`^https://docs\\.djangoproject\\.com/en/${escapedVersion}/topics/[^/]+/?$`),
+    topicsSub: new RegExp(`^https://docs\\.djangoproject\\.com/en/${escapedVersion}/topics/[^/]+/[^/]+/?$`),
+    ref: new RegExp(`^https://docs\\.djangoproject\\.com/en/${escapedVersion}/ref/[^/]+/[^/]+/?$`),
+    refSub: new RegExp(`^https://docs\\.djangoproject\\.com/en/${escapedVersion}/ref/[^/]+/[^/]+/[^/]+/?$`),
+  };
+}
