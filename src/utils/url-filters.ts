@@ -1,4 +1,4 @@
-import { getUrlPatternsForVersion, DjangoVersion } from '../constants';
+import { getUrlPatternsForVersion, DjangoVersion } from "../constants";
 
 /**
  * Filters a list of URLs to only include those matching our documentation patterns
@@ -29,7 +29,7 @@ export function filterTopicsUrls(urls: string[], version: DjangoVersion): string
 export function filterUrlsBySection(
   urls: string[],
   version: DjangoVersion,
-  section: 'topics' | 'topicsSub' | 'ref' | 'refSub',
+  section: "topics" | "topicsSub" | "ref" | "refSub",
 ): string[] {
   const patterns = getUrlPatternsForVersion(version);
   return urls.filter((url) => patterns[section].test(url));
@@ -63,11 +63,11 @@ export function getSectionParentUrl(url: string): string | null {
     return null;
   }
 
-  const segments = parsed.pathname.split('/').filter(Boolean);
+  const segments = parsed.pathname.split("/").filter(Boolean);
   // segments: ["en", "dev", "ref", "class-based-views", "base"]
 
   // Find index of "ref" or "topics"
-  const sectionIndex = segments.findIndex((s) => s === 'ref' || s === 'topics');
+  const sectionIndex = segments.findIndex((s) => s === "ref" || s === "topics");
   if (sectionIndex === -1) return null;
 
   // Top-level = exactly one segment after ref/topics
@@ -80,6 +80,6 @@ export function getSectionParentUrl(url: string): string | null {
 
   // Parent = url truncated to ref/<first-segment>/
   const parentSegments = segments.slice(0, sectionIndex + 2);
-  parsed.pathname = '/' + parentSegments.join('/') + '/';
+  parsed.pathname = "/" + parentSegments.join("/") + "/";
   return parsed.href;
 }
