@@ -360,13 +360,7 @@ describe("url-filters", () => {
 
     describe("invalid URL inputs", () => {
       it("should return null for invalid URL strings", () => {
-        const invalidUrls = [
-          "not-a-url",
-          "://invalid",
-          "http://",
-          "just-text",
-          "",
-        ];
+        const invalidUrls = ["not-a-url", "://invalid", "http://", "just-text", ""];
 
         invalidUrls.forEach((url) => {
           expect(getSectionParentUrl(url)).toBeNull();
@@ -387,11 +381,7 @@ describe("url-filters", () => {
       });
 
       it("should return null for malformed URLs", () => {
-        const malformedUrls = [
-          "http://[invalid",
-          "https:// space.com/path",
-          "ftp://\nnewline.com/path",
-        ];
+        const malformedUrls = ["http://[invalid", "https:// space.com/path", "ftp://\nnewline.com/path"];
 
         malformedUrls.forEach((url) => {
           expect(getSectionParentUrl(url)).toBeNull();

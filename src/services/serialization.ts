@@ -1,4 +1,4 @@
-import { DocEntry } from '../types/DocEntry';
+import { DocEntry } from "../types/DocEntry";
 
 /**
  * Serializable format for DocEntry - stores URLs instead of circular object references.

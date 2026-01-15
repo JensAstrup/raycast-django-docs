@@ -1,15 +1,15 @@
-import * as cheerio from 'cheerio';
-import { DocEntry } from '../types/DocEntry';
-import { DjangoVersion } from '../constants';
-import { fetchSitemap } from './sitemap';
-import { filterTopicsUrls, getSectionParentUrl } from '../utils/url-filters';
+import * as cheerio from "cheerio";
+import { DocEntry } from "../types/DocEntry";
+import { DjangoVersion } from "../constants";
+import { fetchSitemap } from "./sitemap";
+import { filterTopicsUrls, getSectionParentUrl } from "../utils/url-filters";
 import {
   createTurndownService,
   resolveRelativeUrls,
   removeHeaderLinks,
   stripPilcrows,
-} from '../utils/html-to-markdown';
-import { showToast, Toast } from '@raycast/api';
+} from "../utils/html-to-markdown";
+import { showToast, Toast } from "@raycast/api";
 
 interface PageContent {
   title: string;
@@ -50,15 +50,15 @@ export async function fetchPageContent(url: string): Promise<PageContent> {
 
   // Extract prev/next from the Browse navigation before any modifications
   const browseNav = $('nav[aria-labelledby="browse-header"]');
-  let prevHref = browseNav.find('a[rel="prev"]').attr('href');
-  let nextHref = browseNav.find('a[rel="next"]').attr('href');
+  let prevHref = browseNav.find('a[rel="prev"]').attr("href");
+  let nextHref = browseNav.find('a[rel="next"]').attr("href");
   const fallbackNav = $('nav.browse-horizontal[aria-labelledby="browse-horizontal-header"]');
 
   if (!prevHref) {
-    prevHref = fallbackNav.find('.left a[rel="prev"]').attr('href');
+    prevHref = fallbackNav.find('.left a[rel="prev"]').attr("href");
   }
   if (!nextHref) {
-    nextHref = fallbackNav.find('.right a[rel="next"]').attr('href');
+    nextHref = fallbackNav.find('.right a[rel="next"]').attr("href");
   }
 
   const prevUrl = prevHref ? new URL(prevHref, url).href : null;
@@ -67,8 +67,8 @@ export async function fetchPageContent(url: string): Promise<PageContent> {
   removeHeaderLinks($);
   resolveRelativeUrls($, url);
 
-  const title = stripPilcrows($('h1').first().text().trim()) || 'Untitled';
-  const contentHtml = $('#docs-content').html() || $('.body').html() || $('article').html() || '';
+  const title = stripPilcrows($("h1").first().text().trim()) || "Untitled";
+  const contentHtml = $("#docs-content").html() || $(".body").html() || $("article").html() || "";
   const turndownService = createTurndownService();
   const markdown = stripPilcrows(turndownService.turndown(contentHtml));
 

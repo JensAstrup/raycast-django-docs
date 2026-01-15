@@ -1,7 +1,7 @@
-import { Cache } from '@raycast/api';
-import { DocEntry } from '../types/DocEntry';
-import { DjangoVersion } from '../constants';
-import { SerializableEntry, serializeEntries, deserializeEntries } from './serialization';
+import { Cache } from "@raycast/api";
+import { DocEntry } from "../types/DocEntry";
+import { DjangoVersion } from "../constants";
+import { SerializableEntry, serializeEntries, deserializeEntries } from "./serialization";
 
 interface CachedData {
   entries: SerializableEntry[];

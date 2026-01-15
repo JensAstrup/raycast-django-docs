@@ -1,12 +1,11 @@
-import { ActionPanel, List, Action, Icon, showToast, Toast } from '@raycast/api';
-import { useCachedPromise } from '@raycast/utils';
-import { useState, useMemo } from 'react';
-import { DocEntry } from '../types/DocEntry';
-import { fetchDocEntries } from '../services/django-docs';
-import { writeCache, readCache } from '../services/cache';
-import { DocDetail } from '../components/DocDetail';
-import { DJANGO_VERSIONS, DjangoVersion } from '../constants';
-import { SerializableEntry, serializeEntries, deserializeEntries } from '../services/serialization';
+import { ActionPanel, List, Action, Icon, showToast, Toast } from "@raycast/api";
+import { useCachedPromise } from "@raycast/utils";
+import { useState, useMemo } from "react";
+import { fetchDocEntries } from "../services/django-docs";
+import { writeCache, readCache } from "../services/cache";
+import { DocDetail } from "../components/DocDetail";
+import { DJANGO_VERSIONS, DjangoVersion } from "../constants";
+import { SerializableEntry, serializeEntries, deserializeEntries } from "../services/serialization";
 
 async function loadDocEntries(version: DjangoVersion): Promise<SerializableEntry[]> {
   // Try loading from cache first
@@ -16,7 +15,7 @@ async function loadDocEntries(version: DjangoVersion): Promise<SerializableEntry
   }
 
   // No cache - fetch fresh
-  const toast = await showToast({ style: Toast.Style.Animated, title: 'Fetching documentation...' });
+  const toast = await showToast({ style: Toast.Style.Animated, title: "Fetching documentation..." });
   const docEntries = await fetchDocEntries(version);
   toast.hide();
 
@@ -28,13 +27,13 @@ async function loadDocEntries(version: DjangoVersion): Promise<SerializableEntry
 }
 
 export default function SearchDocumentationCommand() {
-  const [version, setVersion] = useState<DjangoVersion>('6.0');
+  const [version, setVersion] = useState<DjangoVersion>("6.0");
 
   const { data: serializedEntries = [], isLoading } = useCachedPromise(loadDocEntries, [version], {
     keepPreviousData: true,
     onError: (error) => {
-      console.error('Error loading docs:', error);
-      showToast({ style: Toast.Style.Failure, title: 'Failed to load documentation' });
+      console.error("Error loading docs:", error);
+      showToast({ style: Toast.Style.Failure, title: "Failed to load documentation" });
     },
   });
 
@@ -44,7 +43,7 @@ export default function SearchDocumentationCommand() {
   const VersionDropdown = () => {
     return (
       <List.Dropdown
-        tooltip="Select a version" 
+        tooltip="Select a version"
         value={version}
         onChange={(newValue: string) => setVersion(newValue as DjangoVersion)}
       >
@@ -67,7 +66,7 @@ export default function SearchDocumentationCommand() {
           id={entry.url}
           icon={Icon.Document}
           title={entry.title}
-          subtitle={entry.parent?.title ?? ''}
+          subtitle={entry.parent?.title ?? ""}
           actions={
             <ActionPanel>
               <Action.Push title="View Documentation" icon={Icon.Eye} target={<DocDetail entry={entry} />} />
