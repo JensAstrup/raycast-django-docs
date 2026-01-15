@@ -1,21 +1,10 @@
-import { Cache } from "@raycast/api";
-import { DocEntry } from "../types/DocEntry";
-import { DjangoVersion } from "../constants";
-
-/**
- * Cacheable format stores URLs instead of object references to avoid circular JSON.
- */
-interface CacheableEntry {
-  url: string;
-  title: string;
-  content: string;
-  parentUrl: string | null;
-  previousUrl: string | null;
-  nextUrl: string | null;
-}
+import { Cache } from '@raycast/api';
+import { DocEntry } from '../types/DocEntry';
+import { DjangoVersion } from '../constants';
+import { SerializableEntry, serializeEntries, deserializeEntries } from './serialization';
 
 interface CachedData {
-  entries: CacheableEntry[];
+  entries: SerializableEntry[];
   lastRefresh: number;
 }
 

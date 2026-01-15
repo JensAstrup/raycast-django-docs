@@ -1,63 +1,12 @@
-import { ActionPanel, List, Action, Icon, showToast, Toast } from "@raycast/api";
-import { useCachedPromise } from "@raycast/utils";
-import { useState, useMemo } from "react";
-import { DocEntry } from "../types/DocEntry";
-import { fetchDocEntries } from "../services/django-docs";
-import { writeCache, readCache } from "../services/cache";
-import { DocDetail } from "../components/DocDetail";
-import { DjangoVersion } from "../constants";
-
-/**
- * Serializable format for caching - stores URLs instead of circular object references.
- */
-interface SerializableEntry {
-  url: string;
-  title: string;
-  content: string;
-  parentUrl: string | null;
-  previousUrl: string | null;
-  nextUrl: string | null;
-}
-
-/**
- * Convert DocEntry[] to serializable format (no circular refs).
- */
-function serializeEntries(entries: DocEntry[]): SerializableEntry[] {
-  return entries.map((e) => ({
-    url: e.url,
-    title: e.title,
-    content: e.content,
-    parentUrl: e.parent?.url ?? null,
-    previousUrl: e.previous?.url ?? null,
-    nextUrl: e.next?.url ?? null,
-  }));
-}
-
-/**
- * Reconstruct DocEntry[] with circular references from serializable format.
- */
-function deserializeEntries(serialized: SerializableEntry[]): DocEntry[] {
-  const entries: DocEntry[] = serialized.map((s) => ({
-    url: s.url,
-    title: s.title,
-    content: s.content,
-    parent: null,
-    previous: null,
-    next: null,
-  }));
-
-  const entryByUrl = new Map(entries.map((e) => [e.url, e]));
-
-  for (let i = 0; i < entries.length; i++) {
-    const entry = entries[i];
-    const s = serialized[i];
-    entry.parent = s.parentUrl ? (entryByUrl.get(s.parentUrl) ?? null) : null;
-    entry.previous = s.previousUrl ? (entryByUrl.get(s.previousUrl) ?? null) : null;
-    entry.next = s.nextUrl ? (entryByUrl.get(s.nextUrl) ?? null) : null;
-  }
-
-  return entries;
-}
+import { ActionPanel, List, Action, Icon, showToast, Toast } from '@raycast/api';
+import { useCachedPromise } from '@raycast/utils';
+import { useState, useMemo } from 'react';
+import { DocEntry } from '../types/DocEntry';
+import { fetchDocEntries } from '../services/django-docs';
+import { writeCache, readCache } from '../services/cache';
+import { DocDetail } from '../components/DocDetail';
+import { DJANGO_VERSIONS, DjangoVersion } from '../constants';
+import { SerializableEntry, serializeEntries, deserializeEntries } from '../services/serialization';
 
 async function loadDocEntries(version: DjangoVersion): Promise<SerializableEntry[]> {
   // Try loading from cache first
