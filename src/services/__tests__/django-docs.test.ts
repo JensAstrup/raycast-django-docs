@@ -284,9 +284,7 @@ describe("django-docs", () => {
         statusText: "Internal Server Error",
       });
 
-      await expect(fetchPageContent(testUrl)).rejects.toThrow(
-        `Failed to fetch ${testUrl}: 500 Internal Server Error`
-      );
+      await expect(fetchPageContent(testUrl)).rejects.toThrow(`Failed to fetch ${testUrl}: 500 Internal Server Error`);
     });
 
     it("should handle network errors", async () => {

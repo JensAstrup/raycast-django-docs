@@ -42,8 +42,8 @@ export function load(content: string, options?: { xmlMode?: boolean }): CheerioS
       },
       attr(name: string, value?: string): string | CheerioSelection {
         if (value === undefined) {
-          // Not casting would violate Cheerio's API contract, which returns an empty string 
-          // "" for attributes that exist but are empty (e.g., <input disabled>), 
+          // Not casting would violate Cheerio's API contract, which returns an empty string
+          // "" for attributes that exist but are empty (e.g., <input disabled>),
           // and undefined only when the attribute doesn't exist.
           return elements[0]?.getAttribute(name) as string;
         } else {

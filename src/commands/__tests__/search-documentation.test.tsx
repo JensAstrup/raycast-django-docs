@@ -11,11 +11,7 @@ jest.mock("../../services/cache");
 // Mock useCachedPromise to simulate the hook behavior
 jest.mock("@raycast/utils", () => ({
   useCachedPromise: jest.fn(
-    (
-      fn: (...args: unknown[]) => Promise<unknown>,
-      args: unknown[],
-      options?: { onError?: (error: Error) => void }
-    ) => {
+    (fn: (...args: unknown[]) => Promise<unknown>, args: unknown[], options?: { onError?: (error: Error) => void }) => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const React = require("react");
       const [result, setResult] = React.useState({
@@ -44,7 +40,7 @@ jest.mock("@raycast/utils", () => ({
       }, [...args]);
 
       return result;
-    }
+    },
   ),
 }));
 
@@ -293,6 +289,7 @@ describe("SearchDocumentationCommand", () => {
     });
 
     it("stops loading when fetch fails", async () => {
+      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
       mockedReadCache.mockReturnValue(null);
       mockedFetchDocEntries.mockRejectedValue(new Error("Network error"));
 
@@ -304,6 +301,8 @@ describe("SearchDocumentationCommand", () => {
 
       const listItems = screen.queryAllByTestId("list-item");
       expect(listItems).toHaveLength(0);
+
+      consoleErrorSpy.mockRestore();
     });
 
     it("does not write to cache when fetch fails", async () => {

@@ -63,5 +63,6 @@
     "test:coverage": "jest --coverage",
     "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
     "publish": "npx @raycast/api@latest publish"
-  }
+  },
+  "packageManager": "yarn@4.10.2+sha512.0b0e54ad5381f0a35184957bd3ea44e37f5a4fb1960b903b0fb9a3c7c2c009190455c41ef2a1977b1dbd3b72c5f152da696e9c52e2bc78a011b6adea8ee73ba3"
 }
