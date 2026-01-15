@@ -66,16 +66,16 @@ export async function fetchDocEntries(version: DjangoVersion): Promise<DocEntry[
     nextUrl: string | null;
   }> = [];
 
-  for (const url of filteredUrls) {
+  const rawEntries = await fetchInBatches(filteredUrls, async (url) => {
     try {
       const { title, content, prevUrl, nextUrl } = await fetchPageContent(url);
-      rawEntries.push({ url, title, content, prevUrl, nextUrl });
+      return { url, title, content, prevUrl, nextUrl };
     } catch (error) {
       console.error(`Failed to fetch ${url}:`, error);
       showToast({ style: Toast.Style.Failure, title: `Failed to fetch ${url}` });
       throw error;
     }
-  }
+  });
 
   // Create DocEntry objects with null references initially
   const entries: DocEntry[] = rawEntries.map((raw) => ({
