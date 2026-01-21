@@ -29,7 +29,11 @@ interface PageContent {
  * @param batchSize - Number of items to process concurrently (default: 10)
  * @returns Array of results in the same order as input items
  */
-async function fetchInBatches(items: string[], mapper: (item: string) => Promise<PageContent>, batchSize: number = 10): Promise<PageContent[]> {
+async function fetchInBatches(
+  items: string[],
+  mapper: (item: string) => Promise<PageContent>,
+  batchSize: number = 10,
+): Promise<PageContent[]> {
   const results: PageContent[] = [];
 
   for (let i = 0; i < items.length; i += batchSize) {
@@ -80,7 +84,7 @@ export async function fetchPageContent(url: string): Promise<PageContent> {
       headings.push(headingText);
     }
   });
-  
+
   const turndownService = createTurndownService();
   const markdown = stripPilcrows(turndownService.turndown(contentHtml));
 

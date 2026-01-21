@@ -1,13 +1,12 @@
-import { ActionPanel, List, Action, Icon, showToast, Toast } from '@raycast/api';
-import { useCachedPromise } from '@raycast/utils';
-import { useState, useMemo } from 'react';
-import Fuse from 'fuse.js';
-import { fetchDocEntries } from '../services/django-docs';
-import { writeCache, readCache } from '../services/cache';
-import { DocDetail } from '../components/DocDetail';
-import { DJANGO_VERSIONS, DjangoVersion } from '../constants';
-import { SerializableEntry, serializeEntries, deserializeEntries } from '../services/serialization';
-
+import { ActionPanel, List, Action, Icon, showToast, Toast } from "@raycast/api";
+import { useCachedPromise } from "@raycast/utils";
+import { useState, useMemo } from "react";
+import Fuse from "fuse.js";
+import { fetchDocEntries } from "../services/django-docs";
+import { writeCache, readCache } from "../services/cache";
+import { DocDetail } from "../components/DocDetail";
+import { DJANGO_VERSIONS, DjangoVersion } from "../constants";
+import { SerializableEntry, serializeEntries, deserializeEntries } from "../services/serialization";
 
 async function loadDocEntries(version: DjangoVersion): Promise<SerializableEntry[]> {
   // Try loading from cache first
@@ -17,7 +16,7 @@ async function loadDocEntries(version: DjangoVersion): Promise<SerializableEntry
   }
 
   // No cache - fetch fresh
-  const toast = await showToast({ style: Toast.Style.Animated, title: 'Fetching documentation...' });
+  const toast = await showToast({ style: Toast.Style.Animated, title: "Fetching documentation..." });
   const docEntries = await fetchDocEntries(version);
   toast.hide();
 
@@ -42,21 +41,21 @@ function VersionDropdown({
       onChange={(newValue: string) => onVersionChange(newValue as DjangoVersion)}
     >
       {DJANGO_VERSIONS.map((ver: string) => (
-        <List.Dropdown.Item key={ver} title={ver === 'dev' ? 'Development (unstable)' : `v${ver}`} value={ver} />
+        <List.Dropdown.Item key={ver} title={ver === "dev" ? "Development (unstable)" : `v${ver}`} value={ver} />
       ))}
     </List.Dropdown>
   );
 }
 
 export default function SearchDocumentationCommand() {
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [version, setVersion] = useState<DjangoVersion>('6.0');
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [version, setVersion] = useState<DjangoVersion>("6.0");
 
   const { data: serializedEntries = [], isLoading } = useCachedPromise(loadDocEntries, [version], {
     keepPreviousData: true,
     onError: (error) => {
-      console.error('Error loading docs:', error);
-      showToast({ style: Toast.Style.Failure, title: 'Failed to load documentation' });
+      console.error("Error loading docs:", error);
+      showToast({ style: Toast.Style.Failure, title: "Failed to load documentation" });
     },
   });
 
@@ -67,12 +66,12 @@ export default function SearchDocumentationCommand() {
   const fuse = useMemo(() => {
     return new Fuse(entries, {
       keys: [
-        { name: 'title', weight: 2 },      // Page title most important
-        { name: 'headings', weight: 1 },   // Section headings for better relevance
+        { name: "title", weight: 2 }, // Page title most important
+        { name: "headings", weight: 1 }, // Section headings for better relevance
       ],
-      threshold: 0.4,                      // 0 = perfect match, 1 = match anything
-      ignoreLocation: true,                // Search entire string, not just beginning
-      minMatchCharLength: 2,               // Require at least 2 characters to match
+      threshold: 0.4, // 0 = perfect match, 1 = match anything
+      ignoreLocation: true, // Search entire string, not just beginning
+      minMatchCharLength: 2, // Require at least 2 characters to match
     });
   }, [entries]);
 
@@ -100,7 +99,7 @@ export default function SearchDocumentationCommand() {
           id={entry.url}
           icon={Icon.Document}
           title={entry.title}
-          subtitle={entry.parent?.title ?? ''}
+          subtitle={entry.parent?.title ?? ""}
           actions={
             <ActionPanel>
               <Action.Push title="View Documentation" icon={Icon.Eye} target={<DocDetail entry={entry} />} />
