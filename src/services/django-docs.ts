@@ -70,8 +70,8 @@ export async function fetchPageContent(url: string): Promise<PageContent> {
   resolveRelativeUrls($, url);
 
   const title = stripPilcrows($("h1").first().text().trim()) || "Untitled";
-  const contentHtml = $("#docs-content").html() || $(".body").html() || $("article").html() || "";
-  
+  const contentHtml = $("#docs-content").html() || "";
+
   // Extract section headings (H2-H4) for better search relevance
   const headings: string[] = [];
   $("#docs-content h2, #docs-content h3, #docs-content h4").each((_, element) => {
