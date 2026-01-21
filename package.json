@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "django-docs",
   "title": "Django Docs",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "description": "Navigate and search through Django documentation",
   "icon": "extension-icon.png",
   "author": "JensAstrup",
