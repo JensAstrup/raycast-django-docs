@@ -8,7 +8,7 @@ export interface SerializableEntry {
   url: string;
   title: string;
   content: string;
-  headings: string[];
+  headings?: string[];
   parentUrl: string | null;
   previousUrl: string | null;
   nextUrl: string | null;
@@ -22,7 +22,7 @@ export function serializeEntries(entries: DocEntry[]): SerializableEntry[] {
     url: entry.url,
     title: entry.title,
     content: entry.content,
-    headings: entry.headings,
+    headings: entry.headings ?? [],
     parentUrl: entry.parent?.url ?? null,
     previousUrl: entry.previous?.url ?? null,
     nextUrl: entry.next?.url ?? null,
@@ -37,7 +37,7 @@ export function deserializeEntries(serializedEntries: SerializableEntry[]): DocE
     url: serializedEntry.url,
     title: serializedEntry.title,
     content: serializedEntry.content,
-    headings: serializedEntry.headings,
+    headings: serializedEntry.headings ?? [],
     parent: null,
     previous: null,
     next: null,
